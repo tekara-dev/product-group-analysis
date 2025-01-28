@@ -1,10 +1,12 @@
-
 const onOpen = () => {
   const ui = SpreadsheetApp.getUi();
-  ui.createMenu('Tekara: Аналитика')
-    .addItem('Начать', "showAnalyticsMenu")
+  ui.createMenu("Tekara: Аналитика")
+    .addItem("Начать", "showAnalyticsMenu")
     .addToUi();
+};
 
+const include = (filename) => {
+  return HtmlService.createHtmlOutputFromFile(filename).getContent();
 };
 
 const onSelectionChange = (e) => {
@@ -18,17 +20,23 @@ const onSelectionChange = (e) => {
   };
 
   // Save data to PropertiesService
-  PropertiesService.getScriptProperties().setProperty('selectionData', JSON.stringify(data));
+  PropertiesService.getScriptProperties().setProperty(
+    "selectionData",
+    JSON.stringify(data)
+  );
 };
 
 // Function to fetch stored selection data
 function getSelectionData() {
-  const data = PropertiesService.getScriptProperties().getProperty('selectionData');
-  return JSON.parse(data || '{}');
+  const data =
+    PropertiesService.getScriptProperties().getProperty("selectionData");
+  return JSON.parse(data || "{}");
 }
 
 const showAnalyticsMenu = () => {
-  const html = HtmlService.createHtmlOutputFromFile('analyticsMenu').setTitle('Tekara: Аналитика');
+  const html = HtmlService.createHtmlOutputFromFile("analyticsMenu")
+    .setTitle("Tekara: Аналитика")
+    .setXFrameOptionsMode(HtmlService.XFrameOptionsMode.ALLOWALL);
   SpreadsheetApp.getUi().showSidebar(html);
 };
 
@@ -41,11 +49,11 @@ const getApiPoint = (point) => {
 
 const getSettings = () => {
   const sheet = SpreadsheetApp.getActiveSpreadsheet().getActiveSheet();
-  const makerCell = sheet.getRange('CellMaker');
+  const makerCell = sheet.getRange("CellMaker");
   const maker = makerCell ? makerCell.getValue() : undefined;
-  const categoryCell = sheet.getRange('CellCategory');
+  const categoryCell = sheet.getRange("CellCategory");
   const category = categoryCell ? categoryCell.getValue() : undefined;
-  const modelCell = sheet.getRange('CellModel');
+  const modelCell = sheet.getRange("CellModel");
   const model = modelCell ? modelCell.getValue() : undefined;
 
   return { maker, category, model };
@@ -56,8 +64,10 @@ const setCellValue = (name, value) => {
   const cell = sheet.getRange(name);
   if (!cell) return;
   cell.setValue(value);
-}
+};
 
-const getMakers = () => getApiPoint('https://mma-api.tekara.ru/api/maker');
-const getCategories = () => getApiPoint('https://mma-api.tekara.ru/api/category');
-const getModels = (makerId, categoryId) => getApiPoint(`https://mma-api.tekara.ru/api/model/${makerId}/${categoryId}`)
+const getMakers = () => getApiPoint("https://mma-api.tekara.ru/api/maker");
+const getCategories = () =>
+  getApiPoint("https://mma-api.tekara.ru/api/category");
+const getModels = (makerId, categoryId) =>
+  getApiPoint(`https://mma-api.tekara.ru/api/model/${makerId}/${categoryId}`);
