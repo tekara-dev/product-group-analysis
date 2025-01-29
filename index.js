@@ -68,7 +68,7 @@ const getSheetSettings = (sheet) => {
   const isDataList =
     sheet.getRange(3, 1).getValue().trim() === "Производитель:";
 
-  if (!isDataList) return undefined;
+  //if (!isDataList) return { sheet: sheet.getName() };
 
   const makerCell = sheet.getRange(4, 1);
   const maker = makerCell.getValue();
@@ -79,7 +79,19 @@ const getSheetSettings = (sheet) => {
   const modelCustomCell = sheet.getRange(13, 1);
   const modelCustom = modelCustomCell.getValue();
 
-  return { maker, category, model, modelCustom };
+  return { maker, category, model, modelCustom, sheet: sheet.getName() };
+};
+
+const navigateToSheet = (name) => {
+    var spreadsheet = SpreadsheetApp.getActiveSpreadsheet();
+    var sheet = spreadsheet.getSheetByName(name);
+  
+    if (!sheet) {
+      Logger.log("Sheet not found: " + name);
+      return;
+    }
+  
+    spreadsheet.setActiveSheet(sheet);
 };
 
 const getNavigationTree = () => {
@@ -89,12 +101,11 @@ const getNavigationTree = () => {
     .filter((x) => x !== undefined);
 
   let grouped = groupBy(settings, "maker");
-  const keys = Object.keys(grouped);
-  for (const key of keys) {
-    arr = grouped[key];
-    if (!arr) return;
+  for (let i = 0; i < grouped.length; i++) {
+    arr = grouped[i];
+    if (!arr.items) continue;
 
-    grouped[key] = groupBy(arr, "category");
+    arr.items = groupBy(arr.items, "category");
   }
   return grouped;
 };
@@ -124,10 +135,20 @@ const getModels = (makerId, categoryId) =>
 const groupBy = (array, key) => {
   return array.reduce((result, item) => {
     const group = item[key];
-    if (!result[group]) {
-      result[group] = [];
+    if (!group) {
+      result.push({ name: item.sheet });
+      return result;
     }
-    result[group].push(item);
+    let added = false;
+    for (let i = 0; i < result.lenght; i++) {
+      if (result[i].name !== "group") continue;
+
+      result[i].items.push(item);
+      added = true;
+    }
+    if (!added) {
+      result.push({ name: group, items: [item] });
+    }
     return result;
-  }, {});
+  }, []);
 };

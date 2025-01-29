@@ -7,6 +7,7 @@
     let result;
     try {
       result = await getServerData("getNavigationTree");
+      console.log("treeData", result);
       removeLoader(loaderText);
     } catch (err) {
       console.error("error:", err);
@@ -15,46 +16,101 @@
     return result || {};
   };
 
-  const fillLevel = (data, to, level) => {
-    if (!data.length) {
-      for (const key of Object.keys(data)) {
-        const node = document.createElement("div");
-        node.className = `node collapsed level-${level}`;
-        node.innerHTML = key.trim();
-        node.style.display = level !== 1 ? "none" : undefined;
-        to.appendChild(node);
+  const isNodeCollapsed = (node) => {
+    return node.className.indexOf("collapsed") > -1;
+  };
 
-        node.addEventListener("click", () => {
-          let collapsed = node.className.indexOf("collapsed") > -1;
-          if (collapsed) {
-            node.className = node.className.replace("collapsed", "expanded");
-          } else {
-            node.className = node.className.replace("expanded", "collapsed");
-          }
-        });
+  const expandNode = (level, node) => {
+    if (!node) return;
 
-        const o = data[key];
-        if (!o) continue;
+    node.className = node.className.replace("collapsed", "expanded");
 
-        fillLevel(o, to, level + 1);
+    let next = node.nextElementSibling;
+    while (next) {
+      const nextLevel = Number(
+        next.className.replace(/.+level-([0-9]{1,2}).*/gi, "$1")
+      );
+      if (nextLevel === level) break;
+      if (nextLevel - level > 1) break;
+
+      next.style.display = "";
+      next = next.nextElementSibling;
+    }
+  };
+
+  const collapseNode = (level, node) => {
+    if (!node) return;
+
+    node.className = node.className.replace("expanded", "collapsed");
+
+    let next = node.nextElementSibling;
+    while (next) {
+      const nextLevel = Number(
+        next.className.replace(/.+level-([0-9]{1,2}).*/gi, "$1")
+      );
+      if (nextLevel === level) break;
+
+      next.style.display = "none";
+
+      if (next.className.indexOf("expanded") > -1) {
+        next.className = next.className.replace("expanded", "collapsed");
       }
-    } else {
-      for (const el of data) {
-        const node = document.createElement("div");
-        node.className = `node leaf level-${level}`;
-        node.style.display = level !== 1 ? "none" : undefined;
-        node.innerHTML = (
-          el.modelCustom
-            ? el.modelCustom.trim() + (el.model ? ` (${el.model.trim()})` : "")
-            : el.model.trim() || "Модель не выбрана"
-        ).trim();
 
-        to.appendChild(node);
+      next = next.nextElementSibling;
+    }
+  };
+
+  const defNodeNames = ["", "Производитель не задан", "Категория не задана"];
+  const addNode = (item, to, level) => {
+    const node = document.createElement("div");
+    node.className = `node collapsed level-${level}`;
+
+    node.innerHTML = (item.name || defNodeNames[level]).trim();
+    node.style.display = level !== 1 ? "none" : undefined;
+    to.appendChild(node);
+
+    node.addEventListener("click", () => {
+      let collapsed = isNodeCollapsed(node);
+      if (collapsed) {
+        expandNode(level, node);
+      } else {
+        collapseNode(level, node);
+      }
+    });
+
+    fillLevel(item.items, to, level + 1);
+  };
+
+  const addLeaf = (el, level, to) => {
+    const node = document.createElement("div");
+    node.className = `node leaf level-${level}`;
+    node.style.display = level !== 1 ? "none" : undefined;
+    node.innerHTML = (
+      el.name
+        ? el.name
+        : el.modelCustom.trim()
+        ? el.modelCustom.trim() + (el.model ? ` (${el.model.trim()})` : "")
+        : el.model.trim() || "Модель не выбрана"
+    ).trim();
+
+    node.addEventListener("click", () => {
+      getServerData("navigateToSheet", [el.sheet || el.name]);
+    });
+
+    to.appendChild(node);
+  };
+
+  const fillLevel = (data, to, level) => {
+    for (const item of data) {
+      if (!item.items) {
+        addLeaf(item, level, to);
+      } else {
+        addNode(item, to, level);
       }
     }
   };
 
   const data = (await getTreeSettings()) || {};
-  console.log("treeData:", data);
+
   fillLevel(data, treeCnt, 1);
 })();
