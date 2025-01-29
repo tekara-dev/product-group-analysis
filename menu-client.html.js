@@ -14,6 +14,10 @@
   var makerDdl = document.getElementById("ddlMaker");
   var catDdl = document.getElementById("ddlCategory");
   var modelDdl = document.getElementById("ddlModel");
+  var modelInput = document.getElementById("inputModel");
+
+  const inputChangeDelay = 500;
+  let inputChangeTimeout;
 
   const startDdlLoader = (ddl, noReset) => {
     if (!noReset) {
@@ -91,6 +95,16 @@
         stopDdlLoader(modelDdl);
       })
       .setCellValue("CellModel", `  ${found.name}`);
+
+    modelInput.value = found.name;
+  };
+
+  const handleCustomModelChange = (val) => {
+    google.script.run
+      .withSuccessHandler(() => {
+        stopDdlLoader(modelDdl);
+      })
+      .setCellValue("CellCustomModel", `  ${val}`);
   };
 
   const fetchAndFillModels = () => {
@@ -136,6 +150,8 @@
     if (!found) return;
 
     modelDdl.value = found.id;
+
+    if (!modelInput.value.trim()) modelInput.value = found.name;
   };
 
   const initFields = () => {
@@ -174,6 +190,8 @@
         setCatValue(selected);
       })
       .getCategories();
+
+    modelInput.value = (cellValues.modelCustom || "").trim();
   };
 
   const refreshSettings = () => {
@@ -218,6 +236,16 @@
   makerDdl.addEventListener("change", handleMakerChange);
   catDdl.addEventListener("change", handleCatChange);
   modelDdl.addEventListener("change", handleModelChange);
+
+  modelInput.addEventListener("input", () => {
+    // Clear the previous timeout
+    clearTimeout(inputChangeTimeout);
+
+    // Set a new timeout
+    inputChangeTimeout = setTimeout(() => {
+      handleCustomModelChange(modelInput.value);
+    }, inputChangeDelay);
+  });
 
   setInterval(poolChanges, 300);
 })();

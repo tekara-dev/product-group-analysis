@@ -58,6 +58,18 @@ option {
   border-radius: 8px;
   position: relative;
 }
+.input {
+  border: 1px solid #f87f8e;
+  color: #fff;
+  border-radius: 8px;
+  background-color: transparent;
+  width: 100%;
+  font-family: inherit;
+  font-size: inherit;
+  line-height: inherit;
+  outline: none;
+  padding: 10px 14px;
+}
 
 .select::after {
   content: "";

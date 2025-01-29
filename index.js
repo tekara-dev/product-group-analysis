@@ -54,8 +54,10 @@ const getSettings = () => {
   const category = categoryCell ? categoryCell.getValue() : undefined;
   const modelCell = sheet.getRange("CellModel");
   const model = modelCell ? modelCell.getValue() : undefined;
+  const modelCustomCell = sheet.getRange("CellCustomModel");
+  const modelCustom = modelCustomCell ? modelCustomCell.getValue() : undefined;
 
-  return { maker, category, model };
+  return { maker, category, model, modelCustom };
 };
 
 const setCellValue = (name, value) => {
