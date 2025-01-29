@@ -1,217 +1,218 @@
-var makerId = "";
-var categoryId = "";
-var modelId = "";
+(() => {
+  var makerId = "";
+  var categoryId = "";
+  var modelId = "";
 
-var models = [];
-var categories = [];
-var makers = [];
+  var models = [];
+  var categories = [];
+  var makers = [];
 
-var cellValues = {};
-var lastPool = {};
-var firstPool = true;
+  var cellValues = {};
+  var lastPool = {};
+  var firstPool = true;
 
-var makerDdl = document.getElementById("ddlMaker");
-var catDdl = document.getElementById("ddlCategory");
-var modelDdl = document.getElementById("ddlModel");
+  var makerDdl = document.getElementById("ddlMaker");
+  var catDdl = document.getElementById("ddlCategory");
+  var modelDdl = document.getElementById("ddlModel");
 
-const startDdlLoader = (ddl, noReset) => {
-  if (!noReset) {
+  const startDdlLoader = (ddl, noReset) => {
+    if (!noReset) {
+      ddl.innerHTML = "";
+      ddl.appendChild(defaultOption({ name: "Подождите...", value: "" }));
+    }
+
+    ddl.disabled = true;
+    ddl.parentElement.className = "select loading";
+  };
+
+  const stopDdlLoader = (ddl) => {
+    ddl.disabled = false;
+    ddl.parentElement.className = "select";
+  };
+
+  const defaultOption = (data) => {
+    const opt = document.createElement("option");
+    opt.value = data.id;
+
+    opt.textContent = data.name;
+    return opt;
+  };
+
+  const fillDdl = (data, ddl) => {
+    if (!data || !ddl) return;
+
     ddl.innerHTML = "";
-    ddl.appendChild(defaultOption({ name: "Подождите...", value: "" }));
-  }
 
-  ddl.disabled = true;
-  ddl.parentElement.className = "select loading";
-};
+    ddl.appendChild(defaultOption({ name: "Не выбрано", value: "" }));
+    data.map(defaultOption).forEach((x) => ddl.appendChild(x));
+  };
 
-const stopDdlLoader = (ddl) => {
-  ddl.disabled = false;
-  ddl.parentElement.className = "select";
-};
+  const handleMakerChange = (ev) => {
+    makerId = ev.target.value;
 
-const defaultOption = (data) => {
-  const opt = document.createElement("option");
-  opt.value = data.id;
+    fetchAndFillModels();
 
-  opt.textContent = data.name;
-  return opt;
-};
+    const found = makers.find((x) => x.id === makerId);
+    if (!found) return;
 
-const fillDdl = (data, ddl) => {
-  if (!data || !ddl) return;
+    startDdlLoader(makerDdl, true);
+    google.script.run
+      .withSuccessHandler(() => {
+        stopDdlLoader(makerDdl);
+      })
+      .setCellValue("CellMaker", `  ${found.name}`);
+  };
 
-  ddl.innerHTML = "";
+  const handleCatChange = (ev) => {
+    categoryId = ev.target.value;
 
-  ddl.appendChild(defaultOption({ name: "Не выбрано", value: "" }));
-  data.map(defaultOption).forEach((x) => ddl.appendChild(x));
-};
+    fetchAndFillModels();
 
-const handleMakerChange = (ev) => {
-  makerId = ev.target.value;
+    const found = categories.find((x) => x.id === categoryId);
+    if (!found) return;
 
-  fetchAndFillModels();
+    startDdlLoader(catDdl, true);
+    google.script.run
+      .withSuccessHandler((data) => {
+        stopDdlLoader(catDdl);
+      })
+      .setCellValue("CellCategory", `  ${found.name}`);
+  };
 
-  const found = makers.find((x) => x.id === makerId);
-  if (!found) return;
+  const handleModelChange = (ev) => {
+    modelId = ev.target.value;
 
-  startDdlLoader(makerDdl, true);
-  google.script.run
-    .withSuccessHandler(() => {
-      stopDdlLoader(makerDdl);
-    })
-    .setCellValue("CellMaker", `  ${found.name}`);
-};
+    const found = models.find((x) => x.id === modelId);
+    if (!found) return;
 
-const handleCatChange = (ev) => {
-  categoryId = ev.target.value;
+    startDdlLoader(modelDdl, true);
+    google.script.run
+      .withSuccessHandler(() => {
+        stopDdlLoader(modelDdl);
+      })
+      .setCellValue("CellModel", `  ${found.name}`);
+  };
 
-  fetchAndFillModels();
+  const fetchAndFillModels = () => {
+    if (!makerId || !categoryId) return;
 
-  const found = categories.find((x) => x.id === categoryId);
-  if (!found) return;
+    startDdlLoader(modelDdl);
 
-  startDdlLoader(catDdl, true);
-  google.script.run
-    .withSuccessHandler((data) => {
-      stopDdlLoader(catDdl);
-    })
-    .setCellValue("CellCategory", `  ${found.name}`);
-};
+    google.script.run
+      .withSuccessHandler((data) => {
+        stopDdlLoader(modelDdl);
 
-const handleModelChange = (ev) => {
-  modelId = ev.target.value;
+        const modelsArr = Object.keys(data).map((x) => data[x]);
+        models = [...modelsArr];
 
-  const found = models.find((x) => x.id === modelId);
-  if (!found) return;
+        fillDdl(modelsArr, modelDdl);
 
-  startDdlLoader(modelDdl, true);
-  google.script.run
-    .withSuccessHandler(() => {
-      stopDdlLoader(modelDdl);
-    })
-    .setCellValue("CellModel", `  ${found.name}`);
-};
+        const selected = cellValues.model;
+        if (!selected) return;
 
-const fetchAndFillModels = () => {
-  if (!makerId || !categoryId) return;
+        setModelValue(selected);
+      })
+      .getModels(makerId, categoryId);
+  };
 
-  startDdlLoader(modelDdl);
+  const setMakerValue = (val, noFire) => {
+    const found = makers.find((x) => x.name.trim() === val.trim());
+    if (!found) return;
 
-  google.script.run
-    .withSuccessHandler((data) => {
-      stopDdlLoader(modelDdl);
+    makerDdl.value = found.id;
+    if (!noFire) handleMakerChange({ target: { value: found.id } });
+  };
 
-      const modelsArr = Object.keys(data).map((x) => data[x]);
-      models = [...modelsArr];
+  const setCatValue = (val, noFire) => {
+    const found = categories.find((x) => x.name.trim() === val.trim());
+    if (!found) return;
 
-      fillDdl(modelsArr, modelDdl);
+    catDdl.value = found.id;
+    if (!noFire) handleCatChange({ target: { value: found.id } });
+  };
 
-      const selected = cellValues.model;
-      if (!selected) return;
+  const setModelValue = (val) => {
+    const found = models.find((x) => x.name.trim() === val.trim());
+    if (!found) return;
 
-      setModelValue(selected);
-    })
-    .getModels(makerId, categoryId);
-};
+    modelDdl.value = found.id;
+  };
 
-const setMakerValue = (val, noFire) => {
-  const found = makers.find((x) => x.name.trim() === val.trim());
-  if (!found) return;
+  const initFields = () => {
+    startDdlLoader(makerDdl);
 
-  makerDdl.value = found.id;
-  if (!noFire) handleMakerChange({ target: { value: found.id } });
-};
+    google.script.run
+      .withSuccessHandler((data) => {
+        stopDdlLoader(makerDdl);
 
-const setCatValue = (val, noFire) => {
-  const found = categories.find((x) => x.name.trim() === val.trim());
-  if (!found) return;
+        const makersArr = Object.keys(data).map((x) => data[x]);
+        makers = [...makersArr];
 
-  catDdl.value = found.id;
-  if (!noFire) handleCatChange({ target: { value: found.id } });
-};
+        fillDdl(makersArr, makerDdl, cellValues.maker);
 
-const setModelValue = (val) => {
-  const found = models.find((x) => x.name.trim() === val.trim());
-  if (!found) return;
+        const selected = cellValues.maker;
+        if (!selected) return;
 
-  modelDdl.value = found.id;
-};
+        setMakerValue(selected);
+      })
+      .getMakers();
 
-const initFields = () => {
-  startDdlLoader(makerDdl);
+    startDdlLoader(catDdl);
 
-  google.script.run
-    .withSuccessHandler((data) => {
-      stopDdlLoader(makerDdl);
+    google.script.run
+      .withSuccessHandler((data) => {
+        stopDdlLoader(catDdl);
 
-      const makersArr = Object.keys(data).map((x) => data[x]);
-      makers = [...makersArr];
+        const makersArr = Object.keys(data).map((x) => data[x]);
+        categories = [...makersArr];
 
-      fillDdl(makersArr, makerDdl, cellValues.maker);
+        fillDdl(makersArr, catDdl, cellValues.category);
 
-      const selected = cellValues.maker;
-      if (!selected) return;
+        const selected = cellValues.category;
+        if (!selected) return;
 
-      setMakerValue(selected);
-    })
-    .getMakers();
+        setCatValue(selected);
+      })
+      .getCategories();
+  };
 
-  startDdlLoader(catDdl);
+  const refreshSettings = () => {
+    startDdlLoader(makerDdl);
+    startDdlLoader(catDdl);
+    modelDdl.disabled = true;
 
-  google.script.run
-    .withSuccessHandler((data) => {
-      stopDdlLoader(catDdl);
+    google.script.run
+      .withSuccessHandler((data) => {
+        stopDdlLoader(makerDdl, true);
+        stopDdlLoader(catDdl);
 
-      const makersArr = Object.keys(data).map((x) => data[x]);
-      categories = [...makersArr];
+        cellValues = { ...data };
 
-      fillDdl(makersArr, catDdl, cellValues.category);
+        initFields();
+      })
+      .getSettings();
+  };
 
-      const selected = cellValues.category;
-      if (!selected) return;
+  const poolChanges = () => {
+    google.script.run
+      .withSuccessHandler((data) => {
+        if (data.sheetName === lastPool.sheetName) return;
+        lastPool = { ...data };
 
-      setCatValue(selected);
-    })
-    .getCategories();
-};
+        if (firstPool) {
+          firstPool = false;
+          return;
+        }
 
-const refreshSettings = () => {
-  startDdlLoader(makerDdl);
-  startDdlLoader(catDdl);
-  modelDdl.disabled = true;
+        cellValues = { ...data.settings };
 
-  google.script.run
-    .withSuccessHandler((data) => {
-      stopDdlLoader(makerDdl, true);
-      stopDdlLoader(catDdl);
+        setMakerValue(cellValues.maker);
+        setCatValue(cellValues.category);
+      })
+      .getSelectionData();
+  };
 
-      cellValues = { ...data };
-
-      initFields();
-    })
-    .getSettings();
-};
-
-const poolChanges = () => {
-  google.script.run
-    .withSuccessHandler((data) => {
-      if (data.sheetName === lastPool.sheetName) return;
-      lastPool = { ...data };
-
-      if (firstPool) {
-        firstPool = false;
-        return;
-      }
-
-      cellValues = { ...data.settings };
-
-      setMakerValue(cellValues.maker);
-      setCatValue(cellValues.category);
-    })
-    .getSelectionData();
-};
-
-window.onload = () => {
+  //Execution logic
   refreshSettings();
 
   makerDdl.addEventListener("change", handleMakerChange);
@@ -219,4 +220,4 @@ window.onload = () => {
   modelDdl.addEventListener("change", handleModelChange);
 
   setInterval(poolChanges, 300);
-};
+})();

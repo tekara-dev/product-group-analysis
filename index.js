@@ -5,7 +5,7 @@ const onOpen = () => {
     .addToUi();
 };
 
-const include = (filename) => {
+const getContent = (filename) => {
   return HtmlService.createHtmlOutputFromFile(filename).getContent();
 };
 
@@ -34,10 +34,9 @@ function getSelectionData() {
 }
 
 const showAnalyticsMenu = () => {
-  const html = HtmlService.createHtmlOutputFromFile("analyticsMenu")
-    .setTitle("Tekara: Аналитика")
-    .setXFrameOptionsMode(HtmlService.XFrameOptionsMode.ALLOWALL);
-  SpreadsheetApp.getUi().showSidebar(html);
+  const html = HtmlService.createTemplateFromFile("analyticsMenu");
+  const output = html.evaluate();
+  SpreadsheetApp.getUi().showSidebar(output);
 };
 
 const getApiPoint = (point) => {
