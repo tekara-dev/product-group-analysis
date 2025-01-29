@@ -1,12 +1,17 @@
 const onOpen = () => {
   const ui = SpreadsheetApp.getUi();
   ui.createMenu("Tekara: Аналитика")
-    .addItem("Начать", "showAnalyticsMenu")
+    .addItem("Настройки", "showAnalyticsMenu")
+    .addItem("Оглавление", "showNavigationMenu")
     .addToUi();
 };
 
 const getContent = (filename) => {
-  return HtmlService.createHtmlOutputFromFile(filename).getContent();
+  try {
+    return HtmlService.createHtmlOutputFromFile(filename).getContent();
+  } catch {
+    return "";
+  }
 };
 
 const onSelectionChange = (e) => {
@@ -34,7 +39,15 @@ function getSelectionData() {
 }
 
 const showAnalyticsMenu = () => {
-  const html = HtmlService.createTemplateFromFile("analyticsMenu");
+  const html = HtmlService.createTemplateFromFile("base");
+  html.page = "settings";
+  const output = html.evaluate();
+  SpreadsheetApp.getUi().showSidebar(output);
+};
+
+const showNavigationMenu = () => {
+  const html = HtmlService.createTemplateFromFile("base");
+  html.page = "navigation";
   const output = html.evaluate();
   SpreadsheetApp.getUi().showSidebar(output);
 };
@@ -48,21 +61,56 @@ const getApiPoint = (point) => {
 
 const getSettings = () => {
   const sheet = SpreadsheetApp.getActiveSpreadsheet().getActiveSheet();
-  const makerCell = sheet.getRange("CellMaker");
-  const maker = makerCell ? makerCell.getValue() : undefined;
-  const categoryCell = sheet.getRange("CellCategory");
-  const category = categoryCell ? categoryCell.getValue() : undefined;
-  const modelCell = sheet.getRange("CellModel");
-  const model = modelCell ? modelCell.getValue() : undefined;
-  const modelCustomCell = sheet.getRange("CellCustomModel");
-  const modelCustom = modelCustomCell ? modelCustomCell.getValue() : undefined;
+  return getSheetSettings(sheet);
+};
+
+const getSheetSettings = (sheet) => {
+  const isDataList =
+    sheet.getRange(3, 1).getValue().trim() === "Производитель:";
+
+  if (!isDataList) return undefined;
+
+  const makerCell = sheet.getRange(4, 1);
+  const maker = makerCell.getValue();
+  const categoryCell = sheet.getRange(7, 1);
+  const category = categoryCell.getValue();
+  const modelCell = sheet.getRange(10, 1);
+  const model = modelCell.getValue();
+  const modelCustomCell = sheet.getRange(13, 1);
+  const modelCustom = modelCustomCell.getValue();
 
   return { maker, category, model, modelCustom };
 };
 
+const getNavigationTree = () => {
+  const sheets = SpreadsheetApp.getActiveSpreadsheet().getSheets();
+  const settings = sheets
+    .map((x) => getSheetSettings(x))
+    .filter((x) => x !== undefined);
+
+  let grouped = groupBy(settings, "maker");
+  const keys = Object.keys(grouped);
+  for (const key of keys) {
+    arr = grouped[key];
+    if (!arr) return;
+
+    grouped[key] = groupBy(arr, "category");
+  }
+  return grouped;
+};
+
+const Cells = {
+  CellMaker: [4, 1],
+  CellCategory: [7, 1],
+  CellModel: [10, 1],
+  CellCustomModel: [13, 1],
+};
 const setCellValue = (name, value) => {
   const sheet = SpreadsheetApp.getActiveSpreadsheet().getActiveSheet();
-  const cell = sheet.getRange(name);
+  const range = Cells[name];
+  if (!range) return;
+
+  const cell = sheet.getRange(range[0], range[1]);
   if (!cell) return;
   cell.setValue(value);
 };
@@ -72,3 +120,14 @@ const getCategories = () =>
   getApiPoint("https://mma-api.tekara.ru/api/category");
 const getModels = (makerId, categoryId) =>
   getApiPoint(`https://mma-api.tekara.ru/api/model/${makerId}/${categoryId}`);
+
+const groupBy = (array, key) => {
+  return array.reduce((result, item) => {
+    const group = item[key];
+    if (!result[group]) {
+      result[group] = [];
+    }
+    result[group].push(item);
+    return result;
+  }, {});
+};

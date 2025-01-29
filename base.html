@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <base target="_top" />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Jost:ital,wght@0,100..900;1,100..900&amp;display=swap"
+      rel="stylesheet"
+    />
+  </head>
+  <body>
+    <div id="loader"></div>
+    <div class="content" id="content"></div>
+  </body>
+  <script>
+    var page = "<?= page; ?>";
+  </script>
+  <script>
+    var loaders = [];
+
+    const renderLoader = () => {
+      document.getElementById("loader").innerHTML = loaders.join("<br />");
+    };
+    const addLoader = (name) => {
+      if (loaders.indexOf(name) === -1) loaders.push(name);
+
+      renderLoader();
+    };
+
+    const removeLoader = (name) => {
+      loaders = loaders.filter((x) => x.trim() !== name.trim());
+
+      renderLoader();
+    };
+
+    const getServerData = (method, props) => {
+      return new Promise((resolve, reject) => {
+        google.script.run
+          .withSuccessHandler((data) => {
+            resolve(data);
+          })
+          .withFailureHandler((err) => {
+            reject(err);
+          })
+          [method].apply(this, props);
+      });
+    };
+
+    const loadContent = async (part, loader) => {
+      const _loader = loader;
+      if (_loader) addLoader(_loader);
+
+      try {
+        const data = await getServerData("getContent", [part]);
+        removeLoader(_loader);
+
+        const to = document.getElementById(`${part}-part`);
+        if (to) {
+          to.innerHTML = data;
+          resolve(true);
+          return;
+        }
+        if (part.indexOf("Content") > -1) {
+          document.getElementById("content").innerHTML = data;
+          resolve(true);
+          return;
+        }
+
+        if (part.indexOf(".css") > -1) {
+          const to = document.getElementsByTagName("head");
+          if (to.length === 0) return;
+
+          const what = document.createElement("style");
+          what.innerHTML = data;
+          to[0].appendChild(what);
+          resolve(true);
+          return;
+        }
+
+        if (part.indexOf(".js") > -1) {
+          const what = document.createElement("script");
+          what.innerHTML = data;
+          document.body.appendChild(what);
+          resolve(true);
+          return;
+        }
+      } catch (err) {
+        removeLoader(_loader);
+        return false;
+      }
+    };
+
+    const loadPart = async (part) => {
+      await Promise.all([
+        loadContent("base.css", "Загружаем стили"),
+        loadContent(`${part}Content`, "Загружаем контент"),
+      ]);
+
+      await loadContent(`${part}.css`, "Загружаем дополнительные стили");
+      await loadContent(`${part}.js`, "Загружаем скрипты");
+    };
+
+    window.addEventListener("load", async () => {
+      loadPart(page);
+    });
+  </script>
+</html>
