@@ -15,6 +15,7 @@
   var catDdl = document.getElementById("ddlCategory");
   var modelDdl = document.getElementById("ddlModel");
   var modelInput = document.getElementById("inputModel");
+  var btnAnal = document.getElementById("btnAnal");
 
   const inputChangeDelay = 500;
   let inputChangeTimeout;
@@ -52,51 +53,54 @@
   };
 
   const handleMakerChange = (ev) => {
-    makerId = ev.target.value;
+    makerId = ev.target.value || "";
+    makerId = makerId === "undefined" ? "" : makerId || "";
 
     fetchAndFillModels();
 
     const found = makers.find((x) => x.id === makerId);
-    if (!found) return;
+    if (makerId && !found) return;
 
     startDdlLoader(makerDdl, true);
     google.script.run
       .withSuccessHandler(() => {
         stopDdlLoader(makerDdl);
       })
-      .setCellValue("CellMaker", `  ${found.name}`);
+      .setCellValue("CellMaker", makerId ? found.name : "");
   };
 
   const handleCatChange = (ev) => {
-    categoryId = ev.target.value;
+    categoryId = ev.target.value || "";
+    categoryId = categoryId === "undefined" ? "" : categoryId || "";
 
     fetchAndFillModels();
 
     const found = categories.find((x) => x.id === categoryId);
-    if (!found) return;
+    if (categoryId && !found) return;
 
     startDdlLoader(catDdl, true);
     google.script.run
       .withSuccessHandler((data) => {
         stopDdlLoader(catDdl);
       })
-      .setCellValue("CellCategory", `  ${found.name}`);
+      .setCellValue("CellCategory", categoryId ? found.name : "");
   };
 
   const handleModelChange = (ev) => {
     modelId = ev.target.value;
+    modelId = modelId === "undefined" ? "" : modelId || "";
 
     const found = models.find((x) => x.id === modelId);
-    if (!found) return;
+    if (modelId && !found) return;
 
     startDdlLoader(modelDdl, true);
     google.script.run
       .withSuccessHandler(() => {
         stopDdlLoader(modelDdl);
       })
-      .setCellValue("CellModel", `  ${found.name}`);
+      .setCellValue("CellModel", modelId ? found.name : "");
 
-    modelInput.value = found.name;
+    if (modelId) modelInput.value = found.name;
   };
 
   const handleCustomModelChange = (val) => {
@@ -104,54 +108,85 @@
       .withSuccessHandler(() => {
         stopDdlLoader(modelDdl);
       })
-      .setCellValue("CellCustomModel", `  ${val}`);
+      .setCellValue("CellCustomModel", val || "");
   };
 
   const fetchAndFillModels = () => {
-    if (!makerId || !categoryId) return;
-
     startDdlLoader(modelDdl);
+
+    const fill = (modelsArr) => {
+      stopDdlLoader(modelDdl);
+
+      fillDdl(modelsArr, modelDdl);
+
+      const selected = cellValues.model;
+      if (!selected) return;
+
+      setModelValue(selected);
+    };
+
+    makerId = makerId === "undefined" ? "" : makerId || "";
+    categoryId = categoryId === "undefined" ? "" : categoryId || "";
+
+    if (!makerId || !categoryId) return fill([]);
 
     google.script.run
       .withSuccessHandler((data) => {
-        stopDdlLoader(modelDdl);
-
         const modelsArr = Object.keys(data).map((x) => data[x]);
         models = [...modelsArr];
 
-        fillDdl(modelsArr, modelDdl);
-
-        const selected = cellValues.model;
-        if (!selected) return;
-
-        setModelValue(selected);
+        fill(models);
       })
       .getModels(makerId, categoryId);
   };
 
   const setMakerValue = (val, noFire) => {
-    const found = makers.find((x) => x.name.trim() === val.trim());
-    if (!found) return;
+    const _val = val === "undefined" ? "" : val || "";
+
+    const found = makers.find((x) => x.name.trim() === _val.trim());
+    if (_val && !found) return;
 
     makerDdl.value = found.id;
+    makerId = _val ? found.id : "";
     if (!noFire) handleMakerChange({ target: { value: found.id } });
   };
 
   const setCatValue = (val, noFire) => {
-    const found = categories.find((x) => x.name.trim() === val.trim());
-    if (!found) return;
+    const _val = val === "undefined" ? "" : val || "";
+
+    const found = categories.find((x) => x.name.trim() === _val.trim());
+    if (_val && !found) return;
 
     catDdl.value = found.id;
+    categoryId = _val ? found.id : "";
     if (!noFire) handleCatChange({ target: { value: found.id } });
   };
 
   const setModelValue = (val) => {
-    const found = models.find((x) => x.name.trim() === val.trim());
-    if (!found) return;
+    const _val = val === "undefined" ? "" : val || "";
+
+    const found = models.find((x) => x.name.trim() === _val.trim());
+    if (_val && !found) return;
 
     modelDdl.value = found.id;
-
+    modelId = _val ? found.id : "";
     if (!modelInput.value.trim()) modelInput.value = found.name;
+  };
+
+  const syncMode = () => {
+    if (!cellValues.isDataList) {
+      [...document.getElementsByClassName("inputCnt")].map(
+        (x) => (x.style.display = "none")
+      );
+      document.getElementById("notDataList").style.display = "";
+      return false;
+    }
+
+    [...document.getElementsByClassName("inputCnt")].map(
+      (x) => (x.style.display = "")
+    );
+    document.getElementById("notDataList").style.display = "none";
+    return true;
   };
 
   const initFields = () => {
@@ -206,6 +241,8 @@
 
         cellValues = { ...data };
 
+        if (!syncMode()) return;
+
         initFields();
       })
       .getSettings();
@@ -224,10 +261,22 @@
 
         cellValues = { ...data.settings };
 
-        setMakerValue(cellValues.maker);
-        setCatValue(cellValues.category);
+        if (!syncMode()) return;
+
+        if (makers.length === 0 || categories.length === 0) {
+          initFields();
+        } else {
+          setMakerValue(cellValues.maker);
+          setCatValue(cellValues.category);
+        }
       })
       .getSelectionData();
+  };
+
+  const handleBtnAnalClick = async () => {
+    console.log("cellValues:", cellValues);
+    const table = await getServerData("getTable", [cellValues.sheet]);
+    console.log("Table", table);
   };
 
   //Execution logic
@@ -236,6 +285,7 @@
   makerDdl.addEventListener("change", handleMakerChange);
   catDdl.addEventListener("change", handleCatChange);
   modelDdl.addEventListener("change", handleModelChange);
+  btnAnal.addEventListener("click", handleBtnAnalClick);
 
   modelInput.addEventListener("input", () => {
     // Clear the previous timeout

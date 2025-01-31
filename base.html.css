@@ -90,6 +90,14 @@ option {
   animation: spin-icon 1s linear infinite;
 }
 
+button {
+    border: 1px solid #D0D5DD;
+    background: #FFF;
+    padding: 10px 16px;
+    color: #475467;
+    border-radius: 8px;
+}
+
 @keyframes spin-icon {
   from {
     transform: rotate(0deg);

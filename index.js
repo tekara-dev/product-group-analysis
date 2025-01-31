@@ -1,7 +1,14 @@
+const Cells = {
+  CellMaker: [2, 2],
+  CellCategory: [2, 3],
+  CellModel: [2, 4],
+  CellCustomModel: [2, 5],
+};
+
 const onOpen = () => {
   const ui = SpreadsheetApp.getUi();
   ui.createMenu("Tekara: Аналитика")
-    .addItem("Настройки", "showAnalyticsMenu")
+    .addItem("Настройки листа", "showAnalyticsMenu")
     .addItem("Оглавление", "showNavigationMenu")
     .addToUi();
 };
@@ -66,32 +73,46 @@ const getSettings = () => {
 
 const getSheetSettings = (sheet) => {
   const isDataList =
-    sheet.getRange(3, 1).getValue().trim() === "Производитель:";
+    sheet.getRange(Cells.CellMaker[0] - 1, Cells.CellMaker[1]).getValue() ===
+    "Производитель:";
 
-  //if (!isDataList) return { sheet: sheet.getName() };
+  if (!isDataList) return { sheet: sheet.getName(), isDataList: false };
 
-  const makerCell = sheet.getRange(4, 1);
+  const makerCell = sheet.getRange(Cells.CellMaker[0], Cells.CellMaker[1]);
   const maker = makerCell.getValue();
-  const categoryCell = sheet.getRange(7, 1);
+  const categoryCell = sheet.getRange(
+    Cells.CellCategory[0],
+    Cells.CellCategory[1]
+  );
   const category = categoryCell.getValue();
-  const modelCell = sheet.getRange(10, 1);
+  const modelCell = sheet.getRange(Cells.CellModel[0], Cells.CellModel[1]);
   const model = modelCell.getValue();
-  const modelCustomCell = sheet.getRange(13, 1);
+  const modelCustomCell = sheet.getRange(
+    Cells.CellCustomModel[0],
+    Cells.CellCustomModel[1]
+  );
   const modelCustom = modelCustomCell.getValue();
 
-  return { maker, category, model, modelCustom, sheet: sheet.getName() };
+  return {
+    maker,
+    category,
+    model,
+    modelCustom,
+    sheet: sheet.getName(),
+    isDataList: true,
+  };
 };
 
 const navigateToSheet = (name) => {
-    var spreadsheet = SpreadsheetApp.getActiveSpreadsheet();
-    var sheet = spreadsheet.getSheetByName(name);
-  
-    if (!sheet) {
-      Logger.log("Sheet not found: " + name);
-      return;
-    }
-  
-    spreadsheet.setActiveSheet(sheet);
+  var spreadsheet = SpreadsheetApp.getActiveSpreadsheet();
+  var sheet = spreadsheet.getSheetByName(name);
+
+  if (!sheet) {
+    Logger.log("Sheet not found: " + name);
+    return;
+  }
+
+  spreadsheet.setActiveSheet(sheet);
 };
 
 const getNavigationTree = () => {
@@ -110,12 +131,6 @@ const getNavigationTree = () => {
   return grouped;
 };
 
-const Cells = {
-  CellMaker: [4, 1],
-  CellCategory: [7, 1],
-  CellModel: [10, 1],
-  CellCustomModel: [13, 1],
-};
 const setCellValue = (name, value) => {
   const sheet = SpreadsheetApp.getActiveSpreadsheet().getActiveSheet();
   const range = Cells[name];
@@ -140,8 +155,8 @@ const groupBy = (array, key) => {
       return result;
     }
     let added = false;
-    for (let i = 0; i < result.lenght; i++) {
-      if (result[i].name !== "group") continue;
+    for (let i = 0; i < result.length; i++) {
+      if (result[i].name !== group) continue;
 
       result[i].items.push(item);
       added = true;

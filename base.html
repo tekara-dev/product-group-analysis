@@ -95,8 +95,10 @@
         loadContent(`${part}Content`, "Загружаем контент"),
       ]);
 
-      await loadContent(`${part}.css`, "Загружаем дополнительные стили");
-      await loadContent(`${part}.js`, "Загружаем скрипты");
+      await Promise.all([
+        loadContent(`${part}.css`, "Загружаем дополнительные стили"),
+        loadContent(`${part}.js`, "Загружаем скрипты"),
+      ]);
     };
 
     window.addEventListener("load", async () => {
