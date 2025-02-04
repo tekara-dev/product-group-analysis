@@ -6,7 +6,9 @@
       href="https://fonts.googleapis.com/css2?family=Jost:ital,wght@0,100..900;1,100..900&amp;display=swap"
       rel="stylesheet"
     />
+    <script src="https://cdn.jsdelivr.net/npm/choices.js@9.0.1/public/assets/scripts/choices.min.js"></script>
   </head>
+
   <body>
     <div id="loader"></div>
     <div class="content" id="content"></div>
@@ -92,6 +94,7 @@
     const loadPart = async (part) => {
       await Promise.all([
         loadContent("base.css", "Загружаем стили"),
+        loadContent("choices.css", "Загружаем стили списков"),
         loadContent(`${part}Content`, "Загружаем контент"),
       ]);
 

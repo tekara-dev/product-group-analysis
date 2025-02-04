@@ -32,7 +32,7 @@ h1 {
   gap: 4px;
 }
 
-select {
+.select select {
   appearance: none;
   background-color: transparent;
   border: none;
@@ -48,7 +48,7 @@ select {
   padding: 10px 14px;
 }
 
-option {
+.select option {
   color: #101828;
 }
 
