@@ -2,6 +2,11 @@ const testGetTable = () => {
   return getTable("Test");
 };
 
+const getActiveTable = () => {
+  var spreadsheet = SpreadsheetApp.getActiveSpreadsheet();
+  return getTable(spreadsheet.getActiveSheet().getName());
+};
+
 const getTable = (sheetName) => {
   var spreadsheet = SpreadsheetApp.getActiveSpreadsheet();
   var sheet = spreadsheet.getSheetByName(sheetName);
@@ -76,7 +81,7 @@ const fillCatsLevel = (cat, level, data, partColumnIndex, headerRow) => {
     });
   }
 
-  for (let sub of cat.subs) {
+  for (const sub of cat.subs) {
     fillCatsLevel(sub, level + 1, data, partColumnIndex, headerRow);
   }
 };
@@ -142,4 +147,10 @@ const getProps = (row, partColumnIndex, headerRow) => {
     res.push({ name: headerRow[i], value: val });
   }
   return res;
+};
+
+const selectRow = (row) => {
+  var sheet = SpreadsheetApp.getActiveSpreadsheet().getActiveSheet();
+  var range = sheet.getRange(row, 1, 1, sheet.getLastColumn());
+  range.activate();
 };

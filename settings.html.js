@@ -82,7 +82,7 @@
 
     startDdlLoader(categoryChoices, true);
     google.script.run
-      .withSuccessHandler((data) => {
+      .withSuccessHandler(() => {
         stopDdlLoader(categoryChoices);
       })
       .setCellValue("CellCategory", categoryId ? found.name : "");
@@ -107,7 +107,7 @@
     ]);
 
     stopDdlLoader(modelChoices);
-    
+
     if (modelId) {
       modelInput.value = found.name;
     }
@@ -181,7 +181,7 @@
     if (_val && !found) return;
 
     modelId = _val ? found.id : "";
-    makerChoices.setValue([cellValues.model]);
+    modelChoices.setValue([cellValues.model]);
 
     if (!modelInput.value.trim()) modelInput.value = found.name;
   };
@@ -287,9 +287,15 @@
       .getSelectionData();
   };
 
-  makerChoices = new Choices(makerDdl);
-  categoryChoices = new Choices(catDdl);
-  modelChoices = new Choices(modelDdl);
+  makerChoices = new Choices(makerDdl, {
+    noResultsText: "Производители не найдены",
+  });
+  categoryChoices = new Choices(catDdl, {
+    noResultsText: "Категории не найдены",
+  });
+  modelChoices = new Choices(modelDdl, {
+    noResultsText: "Модели не найдены",
+  });
   modelChoices.disable();
 
   refreshSettings();

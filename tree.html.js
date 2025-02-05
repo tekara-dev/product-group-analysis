@@ -1,4 +1,25 @@
-const generateTree = async ({ onLeafClick, data, to }) => {
+const generateTree = async ({
+  onLeafClick,
+  data,
+  to,
+  getTitle,
+  getLeafIcon,
+  getSubs,
+}) => {
+  const __el = (el, className) => {
+    const res = document.createElement(el);
+    if (className) res.className = className;
+    return res;
+  };
+
+  const titleFunc = getTitle || (({ name }) => name);
+  const subsFunc = getSubs || (({ items }) => items);
+
+  const leafIconFunc =
+    getLeafIcon ||
+    (() =>
+      "data:image/svg+xml,%3Csvg viewBox='0 0 24 24' fill='none' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M3 9H21M3 15H21M12 3V21M7.8 3H16.2C17.8802 3 18.7202 3 19.362 3.32698C19.9265 3.6146 20.3854 4.07354 20.673 4.63803C21 5.27976 21 6.11984 21 7.8V16.2C21 17.8802 21 18.7202 20.673 19.362C20.3854 19.9265 19.9265 20.3854 19.362 20.673C18.7202 21 17.8802 21 16.2 21H7.8C6.11984 21 5.27976 21 4.63803 20.673C4.07354 20.3854 3.6146 19.9265 3.32698 19.362C3 18.7202 3 17.8802 3 16.2V7.8C3 6.11984 3 5.27976 3.32698 4.63803C3.6146 4.07354 4.07354 3.6146 4.63803 3.32698C5.27976 3 6.11984 3 7.8 3Z' stroke='%23F87F8E' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E%0A");
+
   const treeCnt = to || document.getElementById("tree");
   const defNodeNames = [
     "",
@@ -28,9 +49,8 @@ const generateTree = async ({ onLeafClick, data, to }) => {
         next.className.replace(/.+level-([0-9]{1,2}).*/gi, "$1")
       );
       if (nextLevel === level) break;
-      if (nextLevel - level > 1) break;
-
-      next.style.display = "";
+      if (nextLevel - level === 1) next.style.display = "";
+      
       next = next.nextElementSibling;
     }
   };
@@ -45,7 +65,8 @@ const generateTree = async ({ onLeafClick, data, to }) => {
       const nextLevel = Number(
         next.className.replace(/.+level-([0-9]{1,2}).*/gi, "$1")
       );
-      if (nextLevel === level) break;
+
+      if (level >= nextLevel) break;
 
       next.style.display = "none";
 
@@ -61,7 +82,7 @@ const generateTree = async ({ onLeafClick, data, to }) => {
     const node = document.createElement("div");
     node.className = `node collapsed level-${level}`;
 
-    node.innerHTML = (item.name || defNodeNames[level]).trim();
+    node.innerHTML = (titleFunc(item) ?? defNodeNames[level]).trim();
     node.style.display = level !== 1 ? "none" : undefined;
     to.appendChild(node);
 
@@ -74,20 +95,21 @@ const generateTree = async ({ onLeafClick, data, to }) => {
       }
     });
 
-    fillLevel(item.items, to, level + 1);
+    fillLevel(getSubs(item), to, level + 1);
   };
 
   const addLeaf = (el, level, to) => {
-    const node = document.createElement("div");
-    node.className = `node leaf level-${level}`;
+    const node = __el("div", `node leaf level-${level}`);
     node.style.display = level !== 1 ? "none" : undefined;
-    node.innerHTML = (
-      el.name
-        ? el.name
-        : el.modelCustom.trim()
-        ? el.modelCustom.trim() + (el.model ? ` (${el.model.trim()})` : "")
-        : el.model.trim() || "Без названия"
-    ).trim();
+
+    node.innerHTML += (titleFunc(el, true) || "Без названия").trim();
+
+    const iconImg = leafIconFunc(el);
+    if (iconImg) {
+      const icon = __el("div", "icon");
+      icon.style.backgroundImage = `url("${leafIconFunc(el)}")`;
+      node.prepend(icon);
+    }
 
     node.addEventListener("click", () => handleOnClick(el));
 
@@ -96,7 +118,9 @@ const generateTree = async ({ onLeafClick, data, to }) => {
 
   const fillLevel = (data, to, level) => {
     for (const item of data) {
-      if (!item.items) {
+      const items = getSubs(item);
+
+      if (!items || items.length === 0) {
         addLeaf(item, level, to);
       } else {
         addNode(item, to, level);

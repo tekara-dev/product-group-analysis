@@ -8,8 +8,9 @@ const Cells = {
 const onOpen = () => {
   const ui = SpreadsheetApp.getUi();
   ui.createMenu("Tekara: Аналитика")
-    .addItem("Настройки листа", "showAnalyticsMenu")
+    .addItem("Настройки листа", "showSettingsMenu")
     .addItem("Оглавление", "showNavigationMenu")
+    .addItem("Анализ листа", "showAnalizeMenu")
     .addToUi();
 };
 
@@ -45,7 +46,14 @@ function getSelectionData() {
   return JSON.parse(data || "{}");
 }
 
-const showAnalyticsMenu = () => {
+const showAnalizeMenu = () => {
+    const html = HtmlService.createTemplateFromFile("base");
+    html.page = "analyze";
+    const output = html.evaluate();
+    SpreadsheetApp.getUi().showSidebar(output);
+  };
+
+const showSettingsMenu = () => {
   const html = HtmlService.createTemplateFromFile("base");
   html.page = "settings";
   const output = html.evaluate();

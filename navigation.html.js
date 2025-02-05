@@ -29,5 +29,18 @@
     },
     data,
     to: treeCnt,
+    getTitle: ({ name, modelCustom, model }, isLeaf) => {
+      if (!isLeaf) return name;
+
+      if (name) return name.trim();
+
+      const _modelCustom = (modelCustom || "").trim();
+      const _model = (model || "").trim();
+
+      if (_modelCustom && _modelCustom !== _model)
+        return _modelCustom + (_model ? ` (${_model})` : "");
+
+      return _model;
+    },
   });
 })();

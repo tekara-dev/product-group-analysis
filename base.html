@@ -29,7 +29,7 @@
     };
 
     const removeLoader = (name) => {
-      loaders = loaders.filter((x) => x.trim() !== name.trim());
+      loaders = loaders.filter((x) => (x || "").trim() !== (name || "").trim());
 
       renderLoader();
     };
@@ -58,34 +58,31 @@
         const to = document.getElementById(`${part}-part`);
         if (to) {
           to.innerHTML = data;
-          resolve(true);
-          return;
+          return true;
         }
         if (part.indexOf("Content") > -1) {
           document.getElementById("content").innerHTML = data;
-          resolve(true);
-          return;
+          return true;
         }
 
         if (part.indexOf(".css") > -1) {
           const to = document.getElementsByTagName("head");
-          if (to.length === 0) return;
+          if (to.length === 0) return false;
 
           const what = document.createElement("style");
           what.innerHTML = data;
           to[0].appendChild(what);
-          resolve(true);
-          return;
+          return true;
         }
 
         if (part.indexOf(".js") > -1) {
           const what = document.createElement("script");
           what.innerHTML = data;
           document.body.appendChild(what);
-          resolve(true);
-          return;
+          return true;
         }
       } catch (err) {
+        console.error("Error loading content: " + part, err);
         removeLoader(_loader);
         return false;
       }

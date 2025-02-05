@@ -29,7 +29,7 @@
 .tree .node.leaf {
   cursor: pointer;
 }
-.tree .node.leaf:before {
+.tree .node.leaf .icon {
   content: "";
   width: 20px;
   height: 20px;
