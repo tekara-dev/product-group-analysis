@@ -10,17 +10,19 @@
   </head>
 
   <body>
-    <div id="loader"></div>
     <div class="content" id="content"></div>
+    <div id="loader" class="loader"></div>
   </body>
   <script>
     var page = "<?= page; ?>";
   </script>
   <script>
     var loaders = [];
+    const loaderCnt = document.getElementById("loader");
 
     const renderLoader = () => {
-      document.getElementById("loader").innerHTML = loaders.join("<br />");
+      loaderCnt.style.display = loaders.length > 0 ? "" : "none";
+      loaderCnt.innerHTML = loaders.join("<br />");
     };
     const addLoader = (name) => {
       if (loaders.indexOf(name) === -1) loaders.push(name);

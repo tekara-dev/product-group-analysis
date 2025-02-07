@@ -19,8 +19,8 @@
   var data = (await getTreeSettings()) || [];
 
   await Promise.all([
-    loadContent("tree.css", "Загружаем дерево"),
-    loadContent("tree.js"),
+    loadContent("tree/tree.css", "Загружаем дерево"),
+    loadContent("tree/tree.js"),
   ]);
 
   generateTree({
@@ -29,6 +29,7 @@
     },
     data,
     to: treeCnt,
+    getSubs: (node) => node.items,
     getTitle: ({ name, modelCustom, model }, isLeaf) => {
       if (!isLeaf) return name;
 

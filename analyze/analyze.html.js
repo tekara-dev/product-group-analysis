@@ -21,9 +21,11 @@
   var data = (await getTreeSettings()) || [];
 
   await Promise.all([
-    loadContent("tree.css", "Загружаем дерево"),
-    loadContent("tree.js"),
+    loadContent("tree/tree.css", "Загружаем дерево"),
+    loadContent("tree/tree.js"),
   ]);
+
+  console.log(data);
 
   generateTree({
     data,
