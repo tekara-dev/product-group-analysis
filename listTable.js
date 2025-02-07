@@ -1,13 +1,9 @@
-const testGetTable = () => {
-  return getTable("Test");
-};
-
 const getActiveTable = () => {
   var spreadsheet = SpreadsheetApp.getActiveSpreadsheet();
   return getTable(spreadsheet.getActiveSheet().getName());
 };
 
-const getTable = (sheetName) => {
+const getTableInfoData = (sheetName) => {
   var spreadsheet = SpreadsheetApp.getActiveSpreadsheet();
   var sheet = spreadsheet.getSheetByName(sheetName);
 
@@ -18,6 +14,12 @@ const getTable = (sheetName) => {
 
   const headerRow = data[start];
   const partColumnIndex = headerRow.findIndex((col) => col.trim() === "Part");
+  return { data, start, headerRow, partColumnIndex };
+};
+
+const getTable = (sheetName) => {
+  const { data, start, headerRow, partColumnIndex } =
+    getTableInfoData(sheetName);
 
   const leafs = [];
 
@@ -48,12 +50,12 @@ const getTable = (sheetName) => {
     fillCatsLevel(cat, 2, data, partColumnIndex, headerRow);
   }
 
-  return res;
+  return prepareData(res);
 };
 
 const getParentName = (row, level) => {
   for (let i = level; i > 0; i--) {
-    if (row[level]) return row[level];
+    if (row[i]) return row[i];
   }
   return "";
 };
@@ -144,6 +146,8 @@ const getProps = (row, partColumnIndex, headerRow) => {
   for (let i = partColumnIndex + 1; i < headerRow.length; i++) {
     const val = row.length < i ? undefined : row[i];
     if (!val) continue;
+    if (headerRow[i].indexOf("*") > -1) continue;
+
     res.push({ name: headerRow[i], value: val });
   }
   return res;
@@ -153,4 +157,73 @@ const selectRow = (row) => {
   var sheet = SpreadsheetApp.getActiveSpreadsheet().getActiveSheet();
   var range = sheet.getRange(row, 1, 1, sheet.getLastColumn());
   range.activate();
+};
+
+const prepareData = (level) => {
+  const res = level.map(({ name, isLeaf, rowIndex, subs, props = [] }) => ({
+    name,
+    isPart: !!isLeaf,
+    rowIndex,
+    subs: subs ? prepareData(subs) : undefined,
+    props: props.length > 0 ? props : undefined,
+  }));
+  return res;
+};
+
+const fillTestProps = (level, amount) => {
+  if (!level) return;
+  for (let i = 0; i < level.length; i++) {
+    const leaf = level[i];
+    if (!leaf.props) leaf.props = [];
+
+    new Array(amount).fill(undefined).forEach((_, i) => {
+      leaf.props.push({
+        name: `* Prop${i + 1}`,
+        value: Math.round(Math.random() * 100),
+      });
+    });
+    if (leaf.subs) fillTestProps(leaf.subs, amount);
+  }
+};
+
+const headerIndex = (headerCol, name) => {
+  for (let i = 0; i < headerCol.length; i++) {
+    if (headerCol[i] === name) return i;
+  }
+  return -1;
+};
+
+const fillAnalyzedTable = (level, headerRow, headerRowIndex, sheet) => {
+  for (let node of level) {
+    if (!node.props) continue;
+
+    for (let prop of node.props) {
+      let colIndex = headerIndex(headerRow, prop.name);
+      if (colIndex === -1) {
+        colIndex = headerRow.length;
+        headerRow.push(prop.name);
+        sheet.getRange(headerRowIndex + 1, colIndex + 1).setValue(prop.name);
+      }
+
+      sheet.getRange(node.rowIndex + 1, colIndex + 1).setValue(prop.value);
+    }
+
+    if (node.subs)
+      fillAnalyzedTable(node.subs, headerRow, headerRowIndex, sheet);
+  }
+};
+
+const testAnalyze = () => {
+  const treeData = getActiveTable();
+
+  //Send to @pokoynik here
+
+  //Это мы получили с сервера
+  fillTestProps(treeData, 5);
+
+  var spreadsheet = SpreadsheetApp.getActiveSpreadsheet();
+  var sheet = spreadsheet.getActiveSheet();
+  const { headerRow, start } = getTableInfoData(sheet.getName());
+
+  fillAnalyzedTable(treeData, headerRow, start, sheet);
 };

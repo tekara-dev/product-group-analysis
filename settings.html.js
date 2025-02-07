@@ -15,7 +15,6 @@
   var catDdl = document.getElementById("ddlCategory");
   var modelDdl = document.getElementById("ddlModel");
   var modelInput = document.getElementById("inputModel");
-  var btnAnal = document.getElementById("btnAnal");
 
   var makerChoices = undefined;
   var categoryChoices = undefined;

@@ -72,11 +72,15 @@ h1 {
 }
 
 button {
-    border: 1px solid #D0D5DD;
-    background: #FFF;
-    padding: 10px 16px;
-    color: #475467;
-    border-radius: 8px;
+  border: none;
+  background: #fff;
+  padding: 10px 16px;
+  color: #101828;
+  border-radius: 8px;
+  cursor: pointer;
+}
+button:disabled {
+  background: #f87f8e;
 }
 
 @keyframes spin-icon {
