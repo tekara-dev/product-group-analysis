@@ -38,30 +38,42 @@ const getSelectionData = () => {
   return JSON.parse(data || "{}");
 };
 
-const showAnalizeMenu = () => {
+const showBaseMenu = (page, other) => {
   const html = HtmlService.createTemplateFromFile("base");
-  html.page = "analyze/analyze";
+  html.page = page;
+  html.other = other;
   const output = html.evaluate();
   SpreadsheetApp.getUi().showSidebar(output);
+};
+
+const showAnalizeMenu = () => {
+  const auth = postAuthMe();
+  if (!auth || !auth.id)
+    return showBaseMenu("auth/auth", { from: "analyze/analyze" });
+
+  showBaseMenu("analyze/analyze");
 };
 
 const showSettingsMenu = () => {
-  const html = HtmlService.createTemplateFromFile("base");
-  html.page = "settings/settings";
-  const output = html.evaluate();
-  SpreadsheetApp.getUi().showSidebar(output);
+  const auth = postAuthMe();
+  if (!auth || !auth.id)
+    return showBaseMenu("auth/auth", { from: "settings/settings" });
+
+  showBaseMenu("settings/settings");
 };
 
 const showNavigationMenu = () => {
-  const html = HtmlService.createTemplateFromFile("base");
-  html.page = "navigation/navigation";
-  const output = html.evaluate();
-  SpreadsheetApp.getUi().showSidebar(output);
+  const auth = postAuthMe();
+  if (!auth || !auth.id)
+    return showBaseMenu("auth/auth", { from: "navigation/navigation" });
+
+  showBaseMenu("navigation/navigation");
 };
 
 const showAuthMenu = () => {
-  const html = HtmlService.createTemplateFromFile("base");
-  html.page = "auth/auth";
-  const output = html.evaluate();
-  SpreadsheetApp.getUi().showSidebar(output);
+  const auth = postAuthMe();
+  if (!auth || !auth.id)
+    return showBaseMenu("auth/auth", { from: "auth/auth" });
+
+  showBaseMenu("auth/auth");
 };

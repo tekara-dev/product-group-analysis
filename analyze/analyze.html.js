@@ -2,7 +2,8 @@
   const treeCnt = document.getElementById("tree");
   const btnAnal = document.getElementById("btnAnalyze");
   const supplierDdl = document.getElementById("supplier");
-  let supplierChoices = undefined;
+  var supplierChoices = undefined;
+  var suppliers = []; 
 
   const getTreeSettings = async () => {
     const loaderText = "Загружаем структуру";
@@ -41,9 +42,44 @@
     },
   });
 
+  const fillDdl = (data, ddl, selected) => {
+    if (!ddl) return;
+
+    const toSet = [
+      { name: "Не выбрано", id: "", selected: !selected },
+      ...(data || []).map(({ name, id }) => ({
+        name,
+        id,
+        selected: id === selected || name === selected,
+      })),
+    ];
+
+    ddl.setChoices(
+      toSet,
+      "id", //Откуда брать значение
+      "name", //Откуда брать название
+      true //Очистить предыдущие
+    );
+  };
+
+  const initSuppliers = async () => {
+    addLoader("Получаем поставщиков...");
+    supplierChoices.disable();
+
+    const data = await getServerData("getSuppliers");
+    suppliers = [...data];
+
+    fillDdl(suppliers, supplierChoices);
+
+    supplierChoices.enable(); 
+    removeLoader("Получаем поставщиков...")
+  };
+
   supplierChoices = new Choices(document.getElementById("ddlSupplier"), {
     noResultsText: "Поставщики не найдены",
   });
+
+  initSuppliers();
 
   btnAnal.style.display = "";
   treeCnt.style.display = "";

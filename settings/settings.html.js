@@ -43,8 +43,6 @@
       })),
     ];
 
-    console.log(toSet);
-
     ddl.setChoices(
       toSet,
       "id", //Откуда брать значение
@@ -120,7 +118,7 @@
       .setCellValue("CellCustomModel", val || "");
   };
 
-  const fetchAndFillModels = () => {
+  const fetchAndFillModels = async () => {
     startDdlLoader(modelChoices);
 
     const fill = (modelsArr) => {
@@ -139,14 +137,11 @@
 
     if (!makerId || !categoryId) return fill([]);
 
-    google.script.run
-      .withSuccessHandler((data) => {
-        const modelsArr = Object.keys(data).map((x) => data[x]);
-        models = [...modelsArr];
+    const data = await getServerData("getModels", [makerId, categoryId]);
+    console.log("Models: ", data, makerId, categoryId);
+    models = [...data];
 
-        fill(models);
-      })
-      .getModels(makerId, categoryId);
+    fill(models);
   };
 
   const setMakerValue = (val, noFire) => {
@@ -201,43 +196,42 @@
     return true;
   };
 
-  const initFields = () => {
+  const initMakers = async () => {
     startDdlLoader(makerChoices);
 
-    google.script.run
-      .withSuccessHandler((data) => {
-        stopDdlLoader(makerChoices);
+    const data = await getServerData("getMakers");
 
-        const makersArr = Object.keys(data).map((x) => data[x]);
-        makers = [...makersArr];
+    stopDdlLoader(makerChoices);
 
-        fillDdl(makersArr, makerChoices, cellValues.maker);
+    makers = [...data];
 
-        const selected = cellValues.maker;
-        if (!selected) return;
+    fillDdl(makers, makerChoices, cellValues.maker);
 
-        setMakerValue(selected);
-      })
-      .getMakers();
+    const selected = cellValues.maker;
+    if (!selected) return;
 
+    setMakerValue(selected);
+  };
+
+  const initCategories = async () => {
     startDdlLoader(categoryChoices);
 
-    google.script.run
-      .withSuccessHandler((data) => {
-        stopDdlLoader(categoryChoices);
+    const data = await getServerData("getCategories");
+    stopDdlLoader(categoryChoices);
 
-        const makersArr = Object.keys(data).map((x) => data[x]);
-        categories = [...makersArr];
+    categories = [...data];
 
-        fillDdl(makersArr, categoryChoices, cellValues.category);
+    fillDdl(categories, categoryChoices, cellValues.category);
 
-        const selected = cellValues.category;
-        if (!selected) return;
+    const selected = cellValues.category;
+    if (!selected) return;
 
-        setCatValue(selected);
-      })
-      .getCategories();
+    setCatValue(selected);
+  };
 
+  const initFields = async () => {
+    initMakers();
+    initCategories();
     modelInput.value = (cellValues.modelCustom || "").trim();
   };
 

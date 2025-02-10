@@ -4,10 +4,6 @@ const ApiUrl = "https://cs-api.tkr.dev/api";
 
 const tokenProp = "tkrtkn";
 
-const testAuth = () => {
-  postAuth("tek@tkr.dev", "Diana2000");
-};
-
 const postAuth = (login, password) => {
   var url = `${ApiUrl}/v1/auth/login`;
   var options = {
@@ -21,8 +17,6 @@ const postAuth = (login, password) => {
 
   var response = UrlFetchApp.fetch(url, options);
 
-  Logger.log(response.getContentText());
-
   try {
     const res = response.getContentText();
     const obj = JSON.parse(res);
@@ -35,29 +29,35 @@ const postAuth = (login, password) => {
 };
 
 const postAuthMe = () => {
-  var url = `${ApiUrl}/v2/auth/me`;
+  return getApiPoint(`${ApiUrl}/v2/auth/me`) || {};
+};
+
+const getApiPoint = (point, method = "get", data, noApiKey) => {
+  var url = `${point}`;
   let token = getUserProps(tokenProp);
 
-  Logger.log("token", token);
-
   var options = {
-    method: "get",
+    method,
     contentType: "application/json",
     headers: {
-      "X-Api-Key": ApiKey,
+      ...(noApiKey ? {} : { "X-Api-Key": ApiKey }),
+      Authorization: token,
       Cookie: `tkr_token=${token}`,
     },
+    data,
   };
 
   try {
     var res = UrlFetchApp.fetch(url, options);
-    const obj = JSON.parse(res);
+    const text = res.getContentText();
+    Logger.log(`Point: ${point}`);
+    Logger.log(text);
+    const obj = JSON.parse(text);
     return obj;
-  } catch {
-    //;
+  } catch (e) {
+    Logger.log("Error!", point, e);
   }
-
-  return {};
+  return undefined;
 };
 
 const logout = () => {

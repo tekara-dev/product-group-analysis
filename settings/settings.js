@@ -52,15 +52,8 @@ const setCellValue = (name, value) => {
   cell.setValue(value);
 };
 
-const getApiPoint = (point) => {
-  const apiUrl = point;
-  const resp = UrlFetchApp.fetch(apiUrl);
-  const text = resp.getContentText();
-  return JSON.parse(text);
-};
-
-const getMakers = () => getApiPoint("https://mma-api.tekara.ru/api/maker");
+const getMakers = () => getApiPoint("https://offers-moder-api.tkr.dev/api/catalog/makers");
 const getCategories = () =>
-  getApiPoint("https://mma-api.tekara.ru/api/category");
+  getApiPoint("https://offers-moder-api.tkr.dev/api/catalog/categories");
 const getModels = (makerId, categoryId) =>
-  getApiPoint(`https://mma-api.tekara.ru/api/model/${makerId}/${categoryId}`);
+  getApiPoint(`https://offers-moder-api.tkr.dev/api/catalog/models?makerId=${makerId}&categoryId=${categoryId}`);

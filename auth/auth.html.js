@@ -7,6 +7,12 @@
   const btnLogout = document.getElementById("btnLogout");
   const errorP = document.getElementById("error");
 
+  const redirect = async (to) => {
+    addLoader("Перенаправляем...");
+    await getServerData("showBaseMenu", [to]);
+    removeLoader("Перенаправляем...");
+  };
+
   const refresh = async () => {
     addLoader("Обновляем информацию об авторизации...");
 
@@ -19,6 +25,10 @@
       cntInfo.getElementsByTagName(
         "span"
       )[0].innerHTML = `${firstName} ${lastName}`;
+
+      if (pageData && pageData.from) {
+        redirect(pageData.from);
+      }
     } else {
       cntForm.style.display = "";
       cntInfo.style.display = "none";
