@@ -37,10 +37,28 @@
       renderLoader();
     };
 
-    const getServerData = (method, props) => {
+    const getMethodCacheKey = (method, props = ["noProps"]) => {
+      const key = `${method}-${props
+        .map((x) => (x ? x.toString() : "undefined"))
+        .join("-")}`;
+      return key;
+    };
+
+    const getServerData = (method, props, useCache) => {
+      const key = getMethodCacheKey(method, props);
+
       return new Promise((resolve, reject) => {
+        if (useCache && window.getCached) {
+          const val = getCached(key);
+          if (val) {
+            resolve(val);
+            return;
+          }
+        }
         google.script.run
           .withSuccessHandler((data) => {
+            if (useCache && window.setCached) setCached(key, data);
+
             resolve(data);
           })
           .withFailureHandler((err) => {
@@ -96,6 +114,7 @@
         loadContent("base.css", "Загружаем стили"),
         loadContent("choices.css", "Загружаем стили списков"),
         loadContent(`${part}Content`, "Загружаем контент"),
+        loadContent("cache/cache.js", "Загружаем кэш"),
       ]);
 
       await Promise.all([

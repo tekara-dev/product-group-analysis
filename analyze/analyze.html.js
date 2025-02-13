@@ -63,7 +63,7 @@
   };
 
   const initSuppliers = async () => {
-    addLoader("Получаем поставщиков...");
+    addLoader("Получаем список поставщиков");
     supplierChoices.disable();
 
     const data = await getServerData("getSuppliers");
@@ -72,7 +72,7 @@
     fillDdl(suppliers, supplierChoices);
 
     supplierChoices.enable(); 
-    removeLoader("Получаем поставщиков...")
+    removeLoader("Получаем список поставщиков")
   };
 
   supplierChoices = new Choices(document.getElementById("ddlSupplier"), {
@@ -87,7 +87,9 @@
 
   btnAnal.addEventListener("click", async () => {
     btnAnal.disabled = true;
+    addLoader("Анализируем");
     await getServerData("testAnalyze");
+    addLoader("Анализируем");
     btnAnal.disabled = false;
   });
 })();

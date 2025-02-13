@@ -23,25 +23,31 @@
   const inputChangeDelay = 500;
   let inputChangeTimeout;
 
-  const startDdlLoader = (ddl, noReset) => {
+  const startDdlLoader = (ddl, loaderText) => {
     ddl.disable();
+    if (loaderText) addLoader(loaderText);
   };
 
-  const stopDdlLoader = (ddl) => {
+  const stopDdlLoader = (ddl, loaderText) => {
     ddl.enable();
+    if (loaderText) removeLoader(loaderText);
   };
 
   const fillDdl = (data, ddl, selected) => {
     if (!ddl) return;
 
+    const notSelected =
+      !selected || !data.some((x) => x.id === selected || x.name === selected);
+
     const toSet = [
-      { name: "Не выбрано", id: "", selected: !selected },
+      { name: "Не выбрано", id: "", selected: notSelected },
       ...(data || []).map(({ name, id }) => ({
         name,
         id,
-        selected: id === selected || name === selected,
+        selected: !notSelected && (id === selected || name === selected),
       })),
     ];
+
 
     ddl.setChoices(
       toSet,
@@ -51,38 +57,42 @@
     );
   };
 
-  const handleMakerChange = (ev) => {
+  const handleMakerChange = async (ev, noServerSet) => {
     makerId = ev.target.value || "";
     makerId = makerId === "undefined" ? "" : makerId || "";
 
-    fetchAndFillModels();
+    fetchAndFillModels(noServerSet);
 
     const found = makers.find((x) => x.id === makerId);
     if (makerId && !found) return;
 
-    startDdlLoader(makerChoices, true);
-    google.script.run
-      .withSuccessHandler(() => {
-        stopDdlLoader(makerChoices);
-      })
-      .setCellValue("CellMaker", makerId ? found.name : "");
+    if (noServerSet === true) return;
+
+    startDdlLoader(makerChoices, "Синхронизуем производителя");
+    await getServerData("setCellValue", [
+      "CellMaker",
+      makerId ? found.name : "",
+    ]);
+    stopDdlLoader(makerChoices, "Синхронизуем производителя");
   };
 
-  const handleCatChange = (ev) => {
+  const handleCatChange = async (ev, noServerSet) => {
     categoryId = ev.target.value || "";
     categoryId = categoryId === "undefined" ? "" : categoryId || "";
 
-    fetchAndFillModels();
+    fetchAndFillModels(noServerSet);
 
     const found = categories.find((x) => x.id === categoryId);
     if (categoryId && !found) return;
 
-    startDdlLoader(categoryChoices, true);
-    google.script.run
-      .withSuccessHandler(() => {
-        stopDdlLoader(categoryChoices);
-      })
-      .setCellValue("CellCategory", categoryId ? found.name : "");
+    if (noServerSet === true) return;
+
+    startDdlLoader(categoryChoices, "Синхронизуем категорию");
+    await getServerData("setCellValue", [
+      "CellCategory",
+      categoryId ? found.name : "",
+    ]);
+    stopDdlLoader(categoryChoices, "Синхронизуем категорию");
   };
 
   const handleModelChange = async (ev) => {
@@ -92,7 +102,7 @@
     const found = models.find((x) => x.id === modelId);
     if (modelId && !found) return;
 
-    startDdlLoader(modelChoices, true);
+    startDdlLoader(modelChoices, "Синхронизуем модель");
 
     const nameToSet = modelId ? found.name : "";
 
@@ -103,26 +113,24 @@
         : []),
     ]);
 
-    stopDdlLoader(modelChoices);
+    stopDdlLoader(modelChoices, "Синхронизуем модель");
 
     if (modelId) {
       modelInput.value = found.name;
     }
   };
 
-  const handleCustomModelChange = (val) => {
-    google.script.run
-      .withSuccessHandler(() => {
-        stopDdlLoader(modelChoices);
-      })
-      .setCellValue("CellCustomModel", val || "");
+  const handleCustomModelChange = async (val) => {
+    addLoader("Сихронизуем название модели");
+    await getServerData("setCellValue", ["CellCustomModel", val || ""]);
+    removeLoader("Сихронизуем название модели");
   };
 
   const fetchAndFillModels = async () => {
-    startDdlLoader(modelChoices);
+    startDdlLoader(modelChoices, "Получаем список моделей");
 
     const fill = (modelsArr) => {
-      stopDdlLoader(modelChoices);
+      stopDdlLoader(modelChoices, "Получаем список моделей");
 
       fillDdl(modelsArr, modelChoices, cellValues.model);
 
@@ -137,35 +145,35 @@
 
     if (!makerId || !categoryId) return fill([]);
 
-    const data = await getServerData("getModels", [makerId, categoryId]);
-    console.log("Models: ", data, makerId, categoryId);
+    const data = await getServerData("getModels", [makerId, categoryId], true); //Из кеша, если возможно
     models = [...data];
 
     fill(models);
   };
 
-  const setMakerValue = (val, noFire) => {
+  const setMakerValue = (val, noFire, noServerSet) => {
     const _val = val === "undefined" ? "" : val || "";
 
     const found = makers.find((x) => x.name.trim() === _val.trim());
     if (_val && !found) return;
 
     makerId = _val ? found.id : "";
-    makerChoices.setValue([cellValues.maker]);
+    makerChoices.setChoiceByValue(makerId);
 
-    if (!noFire) handleMakerChange({ target: { value: found.id } });
+    if (!noFire)
+      handleMakerChange({ target: { value: found.id } }, noServerSet);
   };
 
-  const setCatValue = (val, noFire) => {
+  const setCatValue = (val, noFire, noServerSet) => {
     const _val = val === "undefined" ? "" : val || "";
 
     const found = categories.find((x) => x.name.trim() === _val.trim());
     if (_val && !found) return;
 
     categoryId = _val ? found.id : "";
-    categoryChoices.setValue([cellValues.category]);
+    categoryChoices.setChoiceByValue(categoryId);
 
-    if (!noFire) handleCatChange({ target: { value: found.id } });
+    if (!noFire) handleCatChange({ target: { value: found.id } }, noServerSet);
   };
 
   const setModelValue = (val) => {
@@ -175,7 +183,7 @@
     if (_val && !found) return;
 
     modelId = _val ? found.id : "";
-    modelChoices.setValue([cellValues.model]);
+    modelChoices.setChoiceByValue(modelId);
 
     if (!modelInput.value.trim()) modelInput.value = found.name;
   };
@@ -197,11 +205,11 @@
   };
 
   const initMakers = async () => {
-    startDdlLoader(makerChoices);
+    startDdlLoader(makerChoices, "Получаем список производителей");
 
-    const data = await getServerData("getMakers");
+    const data = await getServerData("getMakers", undefined, true); //Из кеша, если есть
 
-    stopDdlLoader(makerChoices);
+    stopDdlLoader(makerChoices, "Получаем список производителей");
 
     makers = [...data];
 
@@ -214,10 +222,10 @@
   };
 
   const initCategories = async () => {
-    startDdlLoader(categoryChoices);
+    startDdlLoader(categoryChoices, "Получаем список категорий");
 
-    const data = await getServerData("getCategories");
-    stopDdlLoader(categoryChoices);
+    const data = await getServerData("getCategories", undefined, true); //Из кеша, если есть
+    stopDdlLoader(categoryChoices, "Получаем список категорий");
 
     categories = [...data];
 
@@ -235,49 +243,46 @@
     modelInput.value = (cellValues.modelCustom || "").trim();
   };
 
-  const refreshSettings = () => {
+  const refreshSettings = async () => {
+    addLoader("Обновляем данные о листе");
     startDdlLoader(makerChoices);
     startDdlLoader(categoryChoices);
     modelDdl.disabled = true;
 
-    google.script.run
-      .withSuccessHandler((data) => {
-        stopDdlLoader(makerChoices, true);
-        stopDdlLoader(categoryChoices);
+    const data = await getServerData("getSettings");
+    stopDdlLoader(makerChoices);
+    stopDdlLoader(categoryChoices);
+    removeLoader("Обновляем данные о листе");
 
-        cellValues = { ...data };
+    cellValues = { ...data };
 
-        if (!syncMode()) return;
+    if (!syncMode()) return;
 
-        initFields();
-      })
-      .getSettings();
+    initFields();
   };
 
-  const poolChanges = () => {
-    google.script.run
-      .withSuccessHandler((data) => {
-        if (data.sheetName === lastPool.sheetName) return;
-        lastPool = { ...data };
+  const poolChanges = async () => {
+    const data = await getServerData("getSelectionData");
 
-        if (firstPool) {
-          firstPool = false;
-          return;
-        }
+    if (data.sheetName === lastPool.sheetName) return;
+    lastPool = { ...data };
 
-        cellValues = { ...data.settings };
+    if (firstPool) {
+      firstPool = false;
+      return;
+    }
 
-        if (!syncMode()) return;
+    cellValues = { ...data.settings };
 
-        if (makers.length === 0 || categories.length === 0) {
-          initFields();
-        } else {
-          setMakerValue(cellValues.maker);
-          setCatValue(cellValues.category);
-          modelInput.value = cellValues.modelCustom;
-        }
-      })
-      .getSelectionData();
+    if (!syncMode()) return;
+
+    if (makers.length === 0 || categories.length === 0) {
+      initFields();
+    } else {
+      setMakerValue(cellValues.maker, false, true);
+      setCatValue(cellValues.category, false, true);
+      modelInput.value = cellValues.modelCustom;
+    }
   };
 
   makerChoices = new Choices(makerDdl, {

@@ -50,10 +50,63 @@ const setCellValue = (name, value) => {
   const cell = sheet.getRange(range[0], range[1]);
   if (!cell) return;
   cell.setValue(value);
+
+  if (name === "CellMaker" || name === "CellCustomModel") {
+    syncSheetName(sheet);
+  }
 };
 
-const getMakers = () => getApiPoint("https://offers-moder-api.tkr.dev/api/catalog/makers");
+const docHasSheetNotSelf = (doc, sheet, name) => {
+  const found = doc.getSheetByName(name);
+  if (!found) return false;
+  if (found.getName() === sheet.getName()) return false;
+
+  return true;
+};
+
+const syncActiveSheenName = () => {
+    const doc = SpreadsheetApp.getActiveSpreadsheet();
+    return syncSheetName(doc.getActiveSheet());
+};
+
+const syncSheetName = (sheet) => {
+  const doc = SpreadsheetApp.getActiveSpreadsheet();
+
+  const makerCell = sheet.getRange(Cells.CellMaker[0], Cells.CellMaker[1]);
+  const maker = makerCell.getValue();
+
+  const modelCell = sheet.getRange(Cells.CellModel[0], Cells.CellModel[1]);
+  const model = modelCell.getValue();
+
+  const customModelCell = sheet.getRange(
+    Cells.CellCustomModel[0],
+    Cells.CellCustomModel[1]
+  );
+  const customModel = customModelCell.getValue();
+
+  let name = [maker, customModel || model || "Без модели"]
+    .filter((x) => !!x)
+    .join("-");
+  if (!name)
+    name = Math.round(Math.random() * 99999)
+      .toString(32)
+      .slice(2);
+  let nameToSet = name;
+  let it = 1;
+  let hasSheet = docHasSheetNotSelf(doc, sheet, name);
+  while (hasSheet) {
+    it++;
+    nameToSet = `${name} (${it})`;
+    hasSheet = docHasSheetNotSelf(doc, sheet, nameToSet);
+  }
+  sheet.setName(nameToSet);
+};
+
+const getMakers = () =>
+  getApiPoint("https://offers-moder-api.tkr.dev/api/catalog/makers");
 const getCategories = () =>
   getApiPoint("https://offers-moder-api.tkr.dev/api/catalog/categories");
 const getModels = (makerId, categoryId) =>
-  getApiPoint(`https://offers-moder-api.tkr.dev/api/catalog/models?makerId=${makerId}&categoryId=${categoryId}`);
+  getApiPoint(
+    `https://offers-moder-api.tkr.dev/api/catalog/models?makerId=${makerId}&categoryId=${categoryId}`
+  );

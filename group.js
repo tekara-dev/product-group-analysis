@@ -8,7 +8,10 @@ const groupActiveList = () => {
     sheet.getName()
   );
 
-  const ranges = [];
+  const groupKey = getRangesPropKey(sheet);
+
+  const ranges = getDocProps(groupKey) || [];
+  if (ranges.length > 0) return;
 
   for (let level = 1; level < partColumnIndex; level++) {
     let groupStart = start + 1;
@@ -28,7 +31,7 @@ const groupActiveList = () => {
     }
   }
 
-  setDocProps(getRangesPropKey(sheet), ranges);
+  setDocProps(groupKey, ranges);
 };
 
 const unGroupRanges = () => {
@@ -48,6 +51,13 @@ const unGroupRanges = () => {
 
 const unGroupAll = () => {
   const sheet = SpreadsheetApp.getActiveSpreadsheet().getActiveSheet();
+
+  const ranges = getDocProps(getRangesPropKey(sheet)) || [];
+  if (ranges.length > 0) {
+    unGroupRanges();
+    return;
+  }
+
   const lastRow = sheet.getLastRow();
 
   let hasGroups = true;
