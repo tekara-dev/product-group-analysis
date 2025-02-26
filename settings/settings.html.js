@@ -33,21 +33,21 @@
     if (loaderText) removeLoader(loaderText);
   };
 
-  const fillDdl = (data, ddl, selected) => {
+  const fillDdl = (data, ddl) => {
+    //, selected) => {
     if (!ddl) return;
 
-    const notSelected =
-      !selected || !data.some((x) => x.id === selected || x.name === selected);
+    // const notSelected =
+    //   !selected || !data.some((x) => x.id === selected || x.name === selected);
 
     const toSet = [
-      { name: "Не выбрано", id: "", selected: notSelected },
+      { name: "Не выбрано", id: "", selected: true }, // notSelected },
       ...(data || []).map(({ name, id }) => ({
         name,
         id,
-        selected: !notSelected && (id === selected || name === selected),
+        //selected: !notSelected && (id === selected || name === selected),
       })),
     ];
-
 
     ddl.setChoices(
       toSet,
@@ -69,9 +69,9 @@
     if (noServerSet === true) return;
 
     startDdlLoader(makerChoices, "Синхронизуем производителя");
-    await getServerData("setCellValue", [
-      "CellMaker",
-      makerId ? found.name : "",
+    await Promise.all([
+      getServerData("setCellValue", ["CellMaker", makerId ? found.name : ""]),
+      getServerData("storeSheetSettings", [makerId, categoryId, modelId]),
     ]);
     stopDdlLoader(makerChoices, "Синхронизуем производителя");
   };
@@ -88,9 +88,12 @@
     if (noServerSet === true) return;
 
     startDdlLoader(categoryChoices, "Синхронизуем категорию");
-    await getServerData("setCellValue", [
-      "CellCategory",
-      categoryId ? found.name : "",
+    await Promise.all([
+      getServerData("setCellValue", [
+        "CellCategory",
+        categoryId ? found.name : "",
+      ]),
+      getServerData("storeSheetSettings", [makerId, categoryId, modelId]),
     ]);
     stopDdlLoader(categoryChoices, "Синхронизуем категорию");
   };
@@ -108,6 +111,7 @@
 
     await Promise.all([
       getServerData("setCellValue", ["CellModel", nameToSet]),
+      getServerData("storeSheetSettings", [makerId, categoryId, modelId]),
       ...(modelId
         ? [getServerData("setCellValue", ["CellCustomModel", nameToSet])]
         : []),
@@ -137,7 +141,7 @@
       const selected = cellValues.model;
       if (!selected) return;
 
-      setModelValue(selected);
+      setModelValue({ name: selected, id: modelId });
     };
 
     makerId = makerId === "undefined" ? "" : makerId || "";
@@ -152,9 +156,12 @@
   };
 
   const setMakerValue = (val, noFire, noServerSet) => {
-    const _val = val === "undefined" ? "" : val || "";
+    const _val =
+      val === "undefined" ? { name: "", id: "" } : val || { name: "", id: "" };
 
-    const found = makers.find((x) => x.name.trim() === _val.trim());
+    let found = makers.find((x) => x.id === _val.id);
+    if (!found) found = makers.find((x) => x.name === _val.name.trim());
+
     if (_val && !found) return;
 
     makerId = _val ? found.id : "";
@@ -165,9 +172,12 @@
   };
 
   const setCatValue = (val, noFire, noServerSet) => {
-    const _val = val === "undefined" ? "" : val || "";
+    const _val =
+      val === "undefined" ? { name: "", id: "" } : val || { name: "", id: "" };
 
-    const found = categories.find((x) => x.name.trim() === _val.trim());
+    let found = categories.find((x) => x.id === _val.id);
+    if (!found) found = categories.find((x) => x.name === _val.name.trim());
+
     if (_val && !found) return;
 
     categoryId = _val ? found.id : "";
@@ -177,9 +187,12 @@
   };
 
   const setModelValue = (val) => {
-    const _val = val === "undefined" ? "" : val || "";
+    const _val =
+      val === "undefined" ? { name: "", id: "" } : val || { name: "", id: "" };
 
-    const found = models.find((x) => x.name.trim() === _val.trim());
+    let found = models.find((x) => x.id === _val.id);
+    if (!found) found = models.find((x) => x.name === _val.name.trim());
+
     if (_val && !found) return;
 
     modelId = _val ? found.id : "";
@@ -218,7 +231,7 @@
     const selected = cellValues.maker;
     if (!selected) return;
 
-    setMakerValue(selected);
+    setMakerValue({ name: selected, id: makerId });
   };
 
   const initCategories = async () => {
@@ -234,7 +247,7 @@
     const selected = cellValues.category;
     if (!selected) return;
 
-    setCatValue(selected);
+    setCatValue({ name: selected, id: categoryId });
   };
 
   const initFields = async () => {
@@ -249,7 +262,16 @@
     startDdlLoader(categoryChoices);
     modelDdl.disabled = true;
 
-    const data = await getServerData("getSettings");
+    const [data, settings] = await Promise.all([
+      getServerData("getSettings"),
+      getServerData("getStoredSheetSettings"),
+    ]);
+    console.log(data, settings);
+
+    modelId = settings.modelId;
+    categoryId = settings.categoryId;
+    makerId = settings.makerId;
+
     stopDdlLoader(makerChoices);
     stopDdlLoader(categoryChoices);
     removeLoader("Обновляем данные о листе");
@@ -273,14 +295,19 @@
     }
 
     cellValues = { ...data.settings };
+    ids = { ...data.ids };
 
     if (!syncMode()) return;
 
     if (makers.length === 0 || categories.length === 0) {
       initFields();
     } else {
-      setMakerValue(cellValues.maker, false, true);
-      setCatValue(cellValues.category, false, true);
+      setMakerValue({ name: cellValues.maker, id: ids.makerId }, false, true);
+      setCatValue(
+        { name: cellValues.category, id: ids.categoryId },
+        false,
+        true
+      );
       modelInput.value = cellValues.modelCustom;
     }
   };

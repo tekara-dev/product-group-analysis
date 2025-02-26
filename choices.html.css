@@ -1,5 +1,9 @@
 .choices {
   position: relative;
+  overflow: hidden;
+}
+.is-open {
+  overflow: visible;
 }
 
 .choices:focus {

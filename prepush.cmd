@@ -1,4 +1,5 @@
 @echo off
+echo Renaming files to Apps Script format
 setlocal enabledelayedexpansion
 for /r %%f in (*.html.*) do (
     set "filepath=%%f"
@@ -10,4 +11,6 @@ for /r %%f in (*.html.*) do (
         )
     )
 )
-echo Pre push renamed.
+color 0a
+echo Done: %date% %time%
+color 07

@@ -11,9 +11,10 @@ const getSettings = () => {
 };
 
 const getSheetSettings = (sheet) => {
-  const isDataList =
-    sheet.getRange(Cells.CellMaker[0] - 1, Cells.CellMaker[1]).getValue() ===
-    "Производитель:";
+  const isDataList = sheet
+    .getRange(Cells.CellMaker[0] - 1, Cells.CellMaker[1])
+    .getValue()
+    .includes("Производитель");
 
   if (!isDataList) return { sheet: sheet.getName(), isDataList: false };
 
@@ -42,6 +43,22 @@ const getSheetSettings = (sheet) => {
   };
 };
 
+const getSheetSettingsKey = (sheetName) => `${sheetName}_listSettings`;
+
+const storeSheetSettings = (makerId, categoryId, modelId) => {
+  const sheet = SpreadsheetApp.getActiveSpreadsheet()
+    .getActiveSheet()
+    .getName();
+  setDocProps(getSheetSettingsKey(sheet), { makerId, categoryId, modelId });
+};
+
+const getStoredSheetSettings = () => {
+  const sheet = SpreadsheetApp.getActiveSpreadsheet()
+    .getActiveSheet()
+    .getName();
+  return getDocProps(getSheetSettingsKey(sheet)) || {};
+};
+
 const setCellValue = (name, value) => {
   const sheet = SpreadsheetApp.getActiveSpreadsheet().getActiveSheet();
   const range = Cells[name];
@@ -65,8 +82,8 @@ const docHasSheetNotSelf = (doc, sheet, name) => {
 };
 
 const syncActiveSheenName = () => {
-    const doc = SpreadsheetApp.getActiveSpreadsheet();
-    return syncSheetName(doc.getActiveSheet());
+  const doc = SpreadsheetApp.getActiveSpreadsheet();
+  return syncSheetName(doc.getActiveSheet());
 };
 
 const syncSheetName = (sheet) => {

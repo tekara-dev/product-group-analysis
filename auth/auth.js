@@ -44,7 +44,7 @@ const getApiPoint = (point, method = "get", data, noApiKey) => {
       Authorization: token,
       Cookie: `tkr_token=${token}`,
     },
-    data,
+    payload: JSON.stringify(data),
   };
 
   try {
@@ -55,7 +55,8 @@ const getApiPoint = (point, method = "get", data, noApiKey) => {
     const obj = JSON.parse(text);
     return obj;
   } catch (e) {
-    Logger.log("Error!", point, e);
+    Logger.log("Error!", point, e.message);
+    throw e.message;
   }
   return undefined;
 };

@@ -5,6 +5,9 @@ const onOpen = () => {
     .addItem("Настройки листа", "showSettingsMenu")
     .addItem("Оглавление", "showNavigationMenu")
     .addItem("Анализ листа", "showAnalizeMenu")
+    .addSeparator()
+    .addItem("Сгруппировать лист", "groupActiveList")
+    .addItem("Убрать группировку", "unGroupAll")
     .addToUi();
 };
 

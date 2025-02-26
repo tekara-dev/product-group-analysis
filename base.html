@@ -21,6 +21,12 @@
     var loaders = [];
     const loaderCnt = document.getElementById("loader");
 
+    const __el = (el, css) => {
+      const res = document.createElement(el);
+      if (css) res.className = css;
+      return res;
+    };
+
     const renderLoader = () => {
       loaderCnt.style.display = loaders.length > 0 ? "" : "none";
       loaderCnt.innerHTML = loaders.join("<br />");
@@ -62,6 +68,7 @@
             resolve(data);
           })
           .withFailureHandler((err) => {
+            console.log("getServerError:", err);
             reject(err);
           })
           [method].apply(this, props);

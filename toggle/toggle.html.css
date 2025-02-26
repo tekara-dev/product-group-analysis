@@ -1,0 +1,39 @@
+.toggle {
+  display: flex;
+  gap: 10px;
+  align-items: center;
+  cursor: pointer;
+}
+
+.toggle-btn {
+  cursor: pointer;
+  width: 44px;
+  height: 24px;
+  border-radius: 22px;
+  /* background-color: var(--Gray-100, #f2f4f7); */
+  background-color: var(--Primary-500, #ff354f);
+  display: flex;
+  align-items: center;
+  padding: 2px;
+}
+.toggle-btn:hover {
+  background-color: var(--Primary-400, #FF5267);
+}
+.toggle-btn:active {
+  outline: 2px solid var(--Primary-500, #ff354f);
+}
+.toggle-btn::before {
+  content: "";
+  width: 20px;
+  height: 20px;
+  border-radius: 10px;
+  background-color: #fff;
+  box-shadow: 0px 1px 2px 0px rgba(16, 24, 40, 0.06),
+    0px 1px 3px 0px rgba(16, 24, 40, 0.1);
+  transition: transform 0.3s ease-in-out;
+}
+/* .toggle.active .toggle-btn {  
+} */
+.toggle.active .toggle-btn::before {
+  transform: translateX(18px);
+}

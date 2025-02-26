@@ -1,6 +1,11 @@
-const getActiveTable = () => {
+const getActiveTable = (withRowIndex) => {
   var spreadsheet = SpreadsheetApp.getActiveSpreadsheet();
-  return getTable(spreadsheet.getActiveSheet().getName());
+  return getTable(spreadsheet.getActiveSheet().getName(), withRowIndex);
+};
+const getValidatedActiveTable = () => {
+  const table = getActiveTable(true);
+  const errors = validateTree(table);
+  return { table, errors };
 };
 
 const getTableInfoData = (sheetName) => {
@@ -17,7 +22,36 @@ const getTableInfoData = (sheetName) => {
   return { data, start, headerRow, partColumnIndex };
 };
 
-const getTable = (sheetName) => {
+const getBaseTree = () => {
+  const { data, start, headerRow } = getTableInfoData("Эталон");
+
+  const partColumnIndex =
+    headerRow.findIndex(
+      (col) => !["No.", "Group", "Sub-group", ""].includes(col.trim())
+    ) - 1;
+
+  const res = [];
+  //Собираем категории верхнего уровня
+  for (let rowIndex = start + 1; rowIndex < data.length; rowIndex++) {
+    const row = data[rowIndex];
+    const name = row[1];
+    if (!name) continue;
+
+    const cat = {
+      name,
+      rowIndex,
+      subs: [],
+      props: getProps(row, partColumnIndex, headerRow),
+    };
+
+    fillCatsLevel(cat, 2, data, partColumnIndex, headerRow, true);
+
+    res.push(cat);
+  }
+  return res;
+};
+
+const getTable = (sheetName, withRowIndex) => {
   const { data, start, headerRow, partColumnIndex } =
     getTableInfoData(sheetName);
 
@@ -31,18 +65,20 @@ const getTable = (sheetName) => {
 
     leafs.push({
       name: row[partColumnIndex],
-      rowIndex: i,
+      rowIndex: i+1,
       isLeaf: true,
+      partNumber: row[partColumnIndex + 1],
       cats: getRowParent(data, i, partColumnIndex, start),
       props: getProps(row, partColumnIndex, headerRow),
     });
   }
 
   //Сворачиваем листья в дерево
-  const res = [];
-  for (let i = 0; i < leafs.length; i++) {
-    const leaf = leafs[i];
-    pushToTree(leaf, res, data, partColumnIndex, headerRow);
+  const res = getBaseTree();
+
+  //Устанавливаем правильные индексы строк
+  for (let cat of res) {
+    fillRowIndex(cat, 1, start, data);
   }
 
   //Дооснащаем дерево всеми другими категориями
@@ -50,7 +86,21 @@ const getTable = (sheetName) => {
     fillCatsLevel(cat, 2, data, partColumnIndex, headerRow);
   }
 
-  return prepareData(res);
+  for (let i = 0; i < leafs.length; i++) {
+    const leaf = leafs[i];
+    hydrateTree(leaf, res, data, partColumnIndex, headerRow);
+  }
+
+  return prepareData(res, withRowIndex);
+};
+
+const fillRowIndex = (cat, level, fromRow, data) => {
+  const rowIndex =
+    data.findIndex((row, i) => i >= fromRow && row[level] === cat.name) + 1;
+  cat.rowIndex = rowIndex;
+  for (let item of cat.subs) {
+    fillRowIndex(item, level + 1, cat.rowIndex, data);
+  }
 };
 
 const getParentName = (row, level) => {
@@ -60,8 +110,15 @@ const getParentName = (row, level) => {
   return "";
 };
 
-const fillCatsLevel = (cat, level, data, partColumnIndex, headerRow) => {
-  if (cat.isLeaf) return;
+const fillCatsLevel = (
+  cat,
+  level,
+  data,
+  partColumnIndex,
+  headerRow,
+  isBase
+) => {
+  if (cat.isLeaf || level === partColumnIndex + (isBase ? 1 : 0)) return;
 
   for (let i = cat.rowIndex + 1; i < data.length; i++) {
     const row = data[i];
@@ -84,11 +141,25 @@ const fillCatsLevel = (cat, level, data, partColumnIndex, headerRow) => {
   }
 
   for (const sub of cat.subs) {
-    fillCatsLevel(sub, level + 1, data, partColumnIndex, headerRow);
+    fillCatsLevel(sub, level + 1, data, partColumnIndex, headerRow, isBase);
   }
 };
 
-const pushToTree = (leaf, tree, data, partColumnIndex, headerRow) => {
+const hydrateProps = (node, props) => {
+  const res = [...(node.props || [])];
+
+  for (const p of props) {
+    let found = res.find((x) => x.name === p.name);
+    if (!found) {
+      found = { ...p };
+      node.props.push(found);
+    }
+    if (p.value) found.value = p.value;
+  }
+  return res;
+};
+
+const hydrateTree = (leaf, tree, data, partColumnIndex, headerRow) => {
   leaf.cats.reduce((to, cat, i) => {
     let found = to.find((x) => x.name === cat.name);
 
@@ -99,6 +170,11 @@ const pushToTree = (leaf, tree, data, partColumnIndex, headerRow) => {
         props: getProps(data[cat.rowIndex], partColumnIndex, headerRow),
       };
       to.push(found);
+    } else {
+      found.props = hydrateProps(
+        found,
+        getProps(data[cat.rowIndex], partColumnIndex, headerRow)
+      );
     }
 
     if (i === leaf.cats.length - 1) {
@@ -136,7 +212,11 @@ const getRowParent = (data, rowIndex, partColumnIndex, headerRowIndex) => {
 };
 
 const rowIsPart = (row, partColumnIndex) => {
-  return row.length > partColumnIndex && !!row[partColumnIndex];
+  return (
+    partColumnIndex > -1 &&
+    row.length > partColumnIndex &&
+    !!row[partColumnIndex]
+  );
 };
 
 const getProps = (row, partColumnIndex, headerRow) => {
@@ -146,9 +226,12 @@ const getProps = (row, partColumnIndex, headerRow) => {
   for (let i = partColumnIndex + 1; i < headerRow.length; i++) {
     const val = row.length < i ? undefined : row[i];
     if (!val) continue;
-    if (headerRow[i].indexOf("*") > -1) continue;
+    const hv = headerRow[i].replace("⁕", "").trim();
+    if (hv.indexOf("*") === 0) continue;
+    if (hv.indexOf("🔒") > -1) continue;
+    if (hv === "Part number") continue;
 
-    res.push({ name: headerRow[i], value: val });
+    res.push({ name: hv, value: val });
   }
   return res;
 };
@@ -159,14 +242,18 @@ const selectRow = (row) => {
   range.activate();
 };
 
-const prepareData = (level) => {
-  const res = level.map(({ name, isLeaf, rowIndex, subs, props = [] }) => ({
-    name,
-    isPart: !!isLeaf,
-    rowIndex,
-    subs: subs ? prepareData(subs) : undefined,
-    props: props.length > 0 ? props : undefined,
-  }));
+const prepareData = (level, withRowIndex) => {
+  const noObj = {};
+  const res = level.map(
+    ({ name, isLeaf, rowIndex, subs, props = [], partNumber }) => ({
+      name,
+      type: isLeaf ? "Part" : "Category",
+      ...(partNumber ? { partNumber } : noObj),
+      ...(withRowIndex ? { rowIndex } : noObj),
+      ...(subs ? { subs: prepareData(subs, withRowIndex) } : noObj),
+      ...(props.length > 0 ? { props } : noObj),
+    })
+  );
   return res;
 };
 
@@ -191,39 +278,4 @@ const headerIndex = (headerCol, name) => {
     if (headerCol[i] === name) return i;
   }
   return -1;
-};
-
-const fillAnalyzedTable = (level, headerRow, headerRowIndex, sheet) => {
-  for (let node of level) {
-    if (!node.props) continue;
-
-    for (let prop of node.props) {
-      let colIndex = headerIndex(headerRow, prop.name);
-      if (colIndex === -1) {
-        colIndex = headerRow.length;
-        headerRow.push(prop.name);
-        sheet.getRange(headerRowIndex + 1, colIndex + 1).setValue(prop.name);
-      }
-
-      sheet.getRange(node.rowIndex + 1, colIndex + 1).setValue(prop.value);
-    }
-
-    if (node.subs)
-      fillAnalyzedTable(node.subs, headerRow, headerRowIndex, sheet);
-  }
-};
-
-const testAnalyze = () => {
-  const treeData = getActiveTable();
-
-  //Send to @pokoynik here
-
-  //Это мы получили с сервера
-  fillTestProps(treeData, 5);
-
-  var spreadsheet = SpreadsheetApp.getActiveSpreadsheet();
-  var sheet = spreadsheet.getActiveSheet();
-  const { headerRow, start } = getTableInfoData(sheet.getName());
-
-  fillAnalyzedTable(treeData, headerRow, start, sheet);
 };

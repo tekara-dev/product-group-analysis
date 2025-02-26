@@ -3,17 +3,14 @@ const generateTree = async ({
   data,
   to,
   getTitle,
+  getBadge,
   getLeafIcon,
   getSubs,
 }) => {
-  const __el = (el, className) => {
-    const res = document.createElement(el);
-    if (className) res.className = className;
-    return res;
-  };
-
+    
   const titleFunc = getTitle || (({ name }) => name);
   const subsFunc = getSubs || (({ items }) => items);
+  const badgeFunc = getBadge;
 
   const leafIconFunc =
     getLeafIcon ||
@@ -50,7 +47,7 @@ const generateTree = async ({
       );
       if (nextLevel === level) break;
       if (nextLevel - level === 1) next.style.display = "";
-      
+
       next = next.nextElementSibling;
     }
   };
@@ -79,11 +76,18 @@ const generateTree = async ({
   };
 
   const addNode = (item, to, level) => {
-    const node = document.createElement("div");
-    node.className = `node collapsed level-${level}`;
+    const node = __el("div", `node collapsed level-${level}`);
 
     node.innerHTML = (titleFunc(item) ?? defNodeNames[level]).trim();
     node.style.display = level !== 1 ? "none" : undefined;
+
+    const badgeVal = badgeFunc ? badgeFunc(item) : undefined;
+    if (badgeVal) {
+      const badge = __el("div", "badge");
+      badge.innerHTML = badgeVal;
+      node.appendChild(badge);
+    }
+
     to.appendChild(node);
 
     node.addEventListener("click", () => {
@@ -95,7 +99,7 @@ const generateTree = async ({
       }
     });
 
-    fillLevel(getSubs(item), to, level + 1);
+    fillLevel(subsFunc(item), to, level + 1);
   };
 
   const addLeaf = (el, level, to) => {
@@ -103,6 +107,13 @@ const generateTree = async ({
     node.style.display = level !== 1 ? "none" : undefined;
 
     node.innerHTML += (titleFunc(el, true) || "Без названия").trim();
+
+    const badgeVal = badgeFunc ? badgeFunc(el) : undefined;
+    if (badgeVal) {
+      const badge = __el("div", "badge");
+      badge.innerHTML = badgeVal;
+      node.appendChild(badge);
+    }
 
     const iconImg = leafIconFunc(el);
     if (iconImg) {
@@ -118,7 +129,7 @@ const generateTree = async ({
 
   const fillLevel = (data, to, level) => {
     for (const item of data) {
-      const items = getSubs(item);
+      const items = subsFunc(item);
 
       if (!items || items.length === 0) {
         addLeaf(item, level, to);

@@ -38,11 +38,27 @@
   background-repeat: no-repeat;
 }
 .tree .node:hover {
-  background-color: #ff002c;
+  background-color: var(--Primary-600, #ff002c);
 }
 .tree .node.level-2 {
   margin-left: 16px;
 }
 .tree .node.level-3 {
   margin-left: 32px;
+}
+
+.badge {
+  font-size: 12px;
+  line-height: 20px;
+  min-width: 20px;
+  padding: 0 4px;
+  height: 20px;
+  font-weight: 500;
+  border-radius: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  color: var(--Primary-700, #e2032b);
+  background-color: var(--Primary-50, #fff6f6);
 }
