@@ -147,7 +147,7 @@
   if (errors.length > 0) {
     console.log("Ошибки в дереве:", errors);
     printError(
-      "В структуре листа данных есть ошибки. Пожалуйста, исправьте их или отключите анализ строк с ошибками.",
+      "В структуре листа данных есть ошибки. Пожалуйста, исправьте их или отключите анализ строк с ошибками. Ниже струптура листа. В индикаторах - количество ошибок в строках.",
       treeStructure
     );
     toggle.style.display = "";
@@ -166,7 +166,7 @@
     let isError = false;
     addLoader("Анализируем");
     try {
-      const res = await getServerData("runAnalyze");
+      const res = await getServerData("runAnalyze", [isAnalyzeErrors]);
     } catch (e) {
       printError(e);
       isError = true;

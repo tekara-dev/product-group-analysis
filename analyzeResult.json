@@ -1,0 +1,664 @@
+
+{
+  "supplier": {
+    "props": [
+      { "name": "Отношение к минимальной цене|значение", "value": "0" },
+      { "name": "Отношение к минимальной цене|отклонение", "value": "0" },
+      { "name": "Отношение к медианной цене|значение", "value": "0" },
+      { "name": "Отношение к медианной цене|отклонение", "value": "0" },
+      { "name": "Количество оцениваемых запчастей", "value": "0" },
+      { "name": "Количество меньше минимального", "value": "0" },
+      { "name": "Количество меньше медианного", "value": "0" }
+    ]
+  },
+  "rows": [
+    {
+      "name": "Engine parts",
+      "type": "Category",
+      "props": [],
+      "subs": [
+        {
+          "name": "Piston group",
+          "type": "Category",
+          "props": [],
+          "subs": [
+            {
+              "name": "Cylinder block",
+              "type": "Part",
+              "props": [],
+              "subs": null,
+              "partNumber": "4932332"
+            },
+            {
+              "name": "Cylinder head",
+              "type": "Part",
+              "props": [],
+              "subs": null,
+              "partNumber": "3971767"
+            },
+            {
+              "name": "Piston liner",
+              "type": "Part",
+              "props": [],
+              "subs": null,
+              "partNumber": "3904166"
+            },
+            {
+              "name": "Piston",
+              "type": "Part",
+              "props": [],
+              "subs": null,
+              "partNumber": "XKDE-01945"
+            },
+            {
+              "name": "Piston pin",
+              "type": "Part",
+              "props": [],
+              "subs": null,
+              "partNumber": "XKDE-01272"
+            },
+            {
+              "name": "Piston rings",
+              "type": "Part",
+              "props": [],
+              "subs": null,
+              "partNumber": "XKDE-01946"
+            },
+            {
+              "name": "Crankshaft",
+              "type": "Part",
+              "props": [],
+              "subs": null,
+              "partNumber": "XKDE-02082"
+            },
+            {
+              "name": "Thrust bearing",
+              "type": "Part",
+              "props": [],
+              "subs": null,
+              "partNumber": "XKDE-02338"
+            },
+            {
+              "name": "Main bearing",
+              "type": "Part",
+              "props": [],
+              "subs": null,
+              "partNumber": "XKDE-00855"
+            }
+          ],
+          "partNumber": null
+        },
+        {
+          "name": "Lubrication system",
+          "type": "Category",
+          "props": [],
+          "subs": [
+            {
+              "name": "Oil pump",
+              "type": "Part",
+              "props": [],
+              "subs": null,
+              "partNumber": "YUBP-09202"
+            }
+          ],
+          "partNumber": null
+        },
+        {
+          "name": "Fuel system",
+          "type": "Category",
+          "props": [],
+          "subs": [
+            {
+              "name": "Fuel system",
+              "type": "Part",
+              "props": [],
+              "subs": null,
+              "partNumber": "3975700"
+            },
+            {
+              "name": "Fuel injector assy",
+              "type": "Part",
+              "props": [],
+              "subs": null,
+              "partNumber": "YUBP-09312"
+            }
+          ],
+          "partNumber": null
+        },
+        {
+          "name": "Intake system",
+          "type": "Category",
+          "props": [],
+          "subs": [
+            {
+              "name": "Turbocharger",
+              "type": "Part",
+              "props": [],
+              "subs": null,
+              "partNumber": "4038288"
+            }
+          ],
+          "partNumber": null
+        },
+        {
+          "name": "Exhaust system",
+          "type": "Category",
+          "props": [],
+          "subs": [
+            {
+              "name": "Exhaust manifold",
+              "type": "Part",
+              "props": [],
+              "subs": null,
+              "partNumber": "XKDE-01208"
+            }
+          ],
+          "partNumber": null
+        },
+        {
+          "name": "Timing gear system",
+          "type": "Category",
+          "props": [],
+          "subs": [
+            {
+              "name": "Exhaust valve",
+              "type": "Part",
+              "props": [],
+              "subs": null,
+              "partNumber": "YUBP-01169"
+            },
+            {
+              "name": "Intake valve",
+              "type": "Part",
+              "props": [],
+              "subs": null,
+              "partNumber": "YUBP-01171"
+            },
+            {
+              "name": "Valve push-rod",
+              "type": "Part",
+              "props": [],
+              "subs": null,
+              "partNumber": "YUBP-01229"
+            },
+            {
+              "name": "Camshaft",
+              "type": "Part",
+              "props": [],
+              "subs": null,
+              "partNumber": "XKDE-00906"
+            }
+          ],
+          "partNumber": null
+        },
+        {
+          "name": "Electric system",
+          "type": "Category",
+          "props": [],
+          "subs": [
+            {
+              "name": "Engine control unit (ECU)",
+              "type": "Part",
+              "props": [],
+              "subs": null,
+              "partNumber": "XKDE-00338"
+            }
+          ],
+          "partNumber": null
+        },
+        {
+          "name": "Rubber parts",
+          "type": "Category",
+          "props": [],
+          "subs": [
+            {
+              "name": "Cylinder head gasket",
+              "type": "Part",
+              "props": [],
+              "subs": null,
+              "partNumber": "XKDE-01093"
+            },
+            {
+              "name": "Valve cover gasket",
+              "type": "Part",
+              "props": [],
+              "subs": null,
+              "partNumber": "XKDE-02626"
+            },
+            {
+              "name": "Oil pan gasket",
+              "type": "Part",
+              "props": [],
+              "subs": null,
+              "partNumber": "XKDE-02700"
+            },
+            {
+              "name": "Crankshaft seal front",
+              "type": "Part",
+              "props": [],
+              "subs": null,
+              "partNumber": "XKDE-02098"
+            },
+            {
+              "name": "Crankshaft seal rear",
+              "type": "Part",
+              "props": [],
+              "subs": null,
+              "partNumber": "YUBP-00153"
+            }
+          ],
+          "partNumber": null
+        },
+        {
+          "name": "Cooling system",
+          "type": "Category",
+          "props": [],
+          "subs": [
+            {
+              "name": "Engine radiator",
+              "type": "Part",
+              "props": [],
+              "subs": null,
+              "partNumber": "XKDE-00981"
+            }
+          ],
+          "partNumber": null
+        }
+      ],
+      "partNumber": null
+    },
+    {
+      "name": "Hydraulc parts",
+      "type": "Category",
+      "props": [],
+      "subs": [
+        {
+          "name": "Main pump",
+          "type": "Category",
+          "props": [],
+          "subs": [],
+          "partNumber": null
+        },
+        {
+          "name": "Main control valve",
+          "type": "Category",
+          "props": [],
+          "subs": [],
+          "partNumber": null
+        },
+        {
+          "name": "Final drive w/motor",
+          "type": "Category",
+          "props": [],
+          "subs": [],
+          "partNumber": null
+        },
+        {
+          "name": "Travel motor",
+          "type": "Category",
+          "props": [],
+          "subs": [],
+          "partNumber": null
+        },
+        {
+          "name": "Swing drive w/motor",
+          "type": "Category",
+          "props": [],
+          "subs": [],
+          "partNumber": null
+        },
+        {
+          "name": "Swing motor",
+          "type": "Category",
+          "props": [],
+          "subs": [],
+          "partNumber": null
+        },
+        {
+          "name": "Swing bearing",
+          "type": "Category",
+          "props": [],
+          "subs": [],
+          "partNumber": null
+        },
+        {
+          "name": "Control joystick",
+          "type": "Category",
+          "props": [],
+          "subs": [],
+          "partNumber": null
+        },
+        {
+          "name": "Bucket cylinder",
+          "type": "Category",
+          "props": [],
+          "subs": [],
+          "partNumber": null
+        },
+        {
+          "name": "Arm cylinder",
+          "type": "Category",
+          "props": [],
+          "subs": [],
+          "partNumber": null
+        },
+        {
+          "name": "Boom cylinder",
+          "type": "Category",
+          "props": [],
+          "subs": [],
+          "partNumber": null
+        },
+        {
+          "name": "Blade lift cylinder",
+          "type": "Category",
+          "props": [],
+          "subs": [],
+          "partNumber": null
+        },
+        {
+          "name": "Blade tilt cylinder",
+          "type": "Category",
+          "props": [],
+          "subs": [],
+          "partNumber": null
+        },
+        {
+          "name": "Steering cylinder",
+          "type": "Category",
+          "props": [],
+          "subs": [],
+          "partNumber": null
+        },
+        {
+          "name": "Oil cooler",
+          "type": "Category",
+          "props": [],
+          "subs": [],
+          "partNumber": null
+        },
+        {
+          "name": "Turning joint",
+          "type": "Category",
+          "props": [],
+          "subs": [],
+          "partNumber": null
+        },
+        {
+          "name": "Transmission pump",
+          "type": "Category",
+          "props": [],
+          "subs": [],
+          "partNumber": null
+        },
+        {
+          "name": "Steering pump (orbitrol)",
+          "type": "Category",
+          "props": [],
+          "subs": [],
+          "partNumber": null
+        },
+        {
+          "name": "Rubber parts",
+          "type": "Category",
+          "props": [],
+          "subs": [],
+          "partNumber": null
+        }
+      ],
+      "partNumber": null
+    },
+    {
+      "name": "Undercarriage parts",
+      "type": "Category",
+      "props": [],
+      "subs": [
+        {
+          "name": "Track group assy",
+          "type": "Category",
+          "props": [],
+          "subs": [],
+          "partNumber": null
+        },
+        {
+          "name": "Sprocket",
+          "type": "Category",
+          "props": [],
+          "subs": [],
+          "partNumber": null
+        },
+        {
+          "name": "Segment group",
+          "type": "Category",
+          "props": [],
+          "subs": [],
+          "partNumber": null
+        },
+        {
+          "name": "Track roller SF",
+          "type": "Category",
+          "props": [],
+          "subs": [],
+          "partNumber": null
+        },
+        {
+          "name": "Track roller DF",
+          "type": "Category",
+          "props": [],
+          "subs": [],
+          "partNumber": null
+        },
+        {
+          "name": "Carrier roller",
+          "type": "Category",
+          "props": [],
+          "subs": [],
+          "partNumber": null
+        },
+        {
+          "name": "Idler",
+          "type": "Category",
+          "props": [],
+          "subs": [],
+          "partNumber": null
+        },
+        {
+          "name": "Track tensioner",
+          "type": "Category",
+          "props": [],
+          "subs": [],
+          "partNumber": null
+        }
+      ],
+      "partNumber": null
+    },
+    {
+      "name": "Work equipment",
+      "type": "Category",
+      "props": [],
+      "subs": [
+        {
+          "name": "Bucket",
+          "type": "Category",
+          "props": [],
+          "subs": [],
+          "partNumber": null
+        },
+        {
+          "name": "Bucket link",
+          "type": "Category",
+          "props": [],
+          "subs": [],
+          "partNumber": null
+        },
+        {
+          "name": "Arm",
+          "type": "Category",
+          "props": [],
+          "subs": [],
+          "partNumber": null
+        },
+        {
+          "name": "Boom",
+          "type": "Category",
+          "props": [],
+          "subs": [],
+          "partNumber": null
+        },
+        {
+          "name": "Cutting tools",
+          "type": "Category",
+          "props": [],
+          "subs": [],
+          "partNumber": null
+        },
+        {
+          "name": "Additional work equipment",
+          "type": "Category",
+          "props": [],
+          "subs": [],
+          "partNumber": null
+        }
+      ],
+      "partNumber": null
+    },
+    {
+      "name": "Filters",
+      "type": "Category",
+      "props": [],
+      "subs": [
+        {
+          "name": "Hydraulic filter",
+          "type": "Category",
+          "props": [],
+          "subs": [
+            {
+              "name": "Engine oil filter",
+              "type": "Part",
+              "props": [],
+              "subs": null,
+              "partNumber": "11N8-70110"
+            }
+          ],
+          "partNumber": null
+        },
+        {
+          "name": "Fuel filter",
+          "type": "Category",
+          "props": [],
+          "subs": [
+            {
+              "name": "Fuel filter primary",
+              "type": "Part",
+              "props": [],
+              "subs": null,
+              "partNumber": "11LG-70010"
+            }
+          ],
+          "partNumber": null
+        },
+        {
+          "name": "Air filter",
+          "type": "Category",
+          "props": [],
+          "subs": [],
+          "partNumber": null
+        }
+      ],
+      "partNumber": null
+    },
+    {
+      "name": "Transmission",
+      "type": "Category",
+      "props": [],
+      "subs": [
+        {
+          "name": "Front axle assy",
+          "type": "Category",
+          "props": [],
+          "subs": [],
+          "partNumber": null
+        },
+        {
+          "name": "Rear axle assy",
+          "type": "Category",
+          "props": [],
+          "subs": [],
+          "partNumber": null
+        },
+        {
+          "name": "Drive shaft group",
+          "type": "Category",
+          "props": [],
+          "subs": [],
+          "partNumber": null
+        },
+        {
+          "name": "Gearbox assy",
+          "type": "Category",
+          "props": [],
+          "subs": [],
+          "partNumber": null
+        },
+        {
+          "name": "Brake system",
+          "type": "Category",
+          "props": [],
+          "subs": [],
+          "partNumber": null
+        }
+      ],
+      "partNumber": null
+    },
+    {
+      "name": "Tyres and discs",
+      "type": "Category",
+      "props": [],
+      "subs": [
+        {
+          "name": "Pneumatic tyre",
+          "type": "Category",
+          "props": [],
+          "subs": [],
+          "partNumber": null
+        },
+        {
+          "name": "Solid tyre",
+          "type": "Category",
+          "props": [],
+          "subs": [],
+          "partNumber": null
+        },
+        {
+          "name": "Wheel disc",
+          "type": "Category",
+          "props": [],
+          "subs": [],
+          "partNumber": null
+        },
+        {
+          "name": "Wheel stud",
+          "type": "Category",
+          "props": [],
+          "subs": [],
+          "partNumber": null
+        },
+        {
+          "name": "Wheel nut",
+          "type": "Category",
+          "props": [],
+          "subs": [],
+          "partNumber": null
+        },
+        {
+          "name": "Air tube",
+          "type": "Category",
+          "props": [],
+          "subs": [],
+          "partNumber": null
+        }
+      ],
+      "partNumber": null
+    }
+  ]
+}

@@ -24,6 +24,7 @@ const generateToggle = (to) => {
   };
 
   const on = (event, handler, key) => {
+    if (!events[event]) events[event] = [];
     events[event].push({ handler, key });
   };
 
@@ -34,6 +35,7 @@ const generateToggle = (to) => {
   };
 
   const emit = (event, data) => {
+    if (!events[event]) return;
     events[event].forEach(({ handler }) => handler(data));
   };
 

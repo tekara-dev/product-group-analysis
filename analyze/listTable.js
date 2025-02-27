@@ -65,7 +65,7 @@ const getTable = (sheetName, withRowIndex) => {
 
     leafs.push({
       name: row[partColumnIndex],
-      rowIndex: i+1,
+      rowIndex: i + 1,
       isLeaf: true,
       partNumber: row[partColumnIndex + 1],
       cats: getRowParent(data, i, partColumnIndex, start),

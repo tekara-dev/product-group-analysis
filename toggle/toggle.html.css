@@ -10,7 +10,6 @@
   width: 44px;
   height: 24px;
   border-radius: 22px;
-  /* background-color: var(--Gray-100, #f2f4f7); */
   background-color: var(--Primary-500, #ff354f);
   display: flex;
   align-items: center;
@@ -32,8 +31,6 @@
     0px 1px 3px 0px rgba(16, 24, 40, 0.1);
   transition: transform 0.3s ease-in-out;
 }
-/* .toggle.active .toggle-btn {  
-} */
 .toggle.active .toggle-btn::before {
   transform: translateX(18px);
 }

@@ -5,7 +5,7 @@
 }
 
 body {
-  background: #e2032b;
+  background: var(--Primary-700, #e2032b);
   color: #fff;
   font-family: "Jost";
   font-size: 14px;
@@ -55,17 +55,17 @@ h1 {
 }
 
 .select option {
-  color: #101828;
+  color: var(--Gray-900, #101828);
 }
 
 .select {
-  border: 1px solid #f87f8e;
+  border: 1px solid var(--Primary-300, #f87f8e);
   color: #fff;
   border-radius: 8px;
   position: relative;
 }
 .input {
-  border: 1px solid #f87f8e;
+  border: 1px solid var(--Primary-300, #f87f8e);
   color: #fff;
   border-radius: 8px;
   background-color: transparent;
@@ -79,20 +79,20 @@ h1 {
 
 button {
   border: none;
-  background: #fff;
+  background: var(--Primary-500, #ff354f);
   padding: 10px 16px;
-  color: #101828;
+  color: var(--Gray-900, #101828);
   border-radius: 8px;
   cursor: pointer;
 }
 button:hover {
-  background-color: #fff6f6;
+  background-color: var(--Primary-50, #fff6f6);
 }
 button:active {
-  background-color: #ffebed;
+  background-color: var(--Primary-100, #ffebed);
 }
 button:disabled {
-  background: #f87f8e;
+  background: var(--Primary-300, #f87f8e);
 }
 
 @keyframes spin-icon {

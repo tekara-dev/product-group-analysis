@@ -1,6 +1,7 @@
 @echo off
 echo Renaming files to Apps Script format
 setlocal enabledelayedexpansion
+for /f %%a in ('echo prompt $E^| cmd') do set "ESC=%%a"
 for /r %%f in (*.html.*) do (
     set "filepath=%%f"
     for %%a in ("!filepath!") do (
@@ -11,6 +12,5 @@ for /r %%f in (*.html.*) do (
         )
     )
 )
-color 0a
-echo Done: %date% %time%
-color 07
+
+echo %ESC%[0;32m Done: %date% %time% %ESC%[0m
