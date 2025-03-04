@@ -79,7 +79,7 @@ h1 {
 
 button {
   border: none;
-  background: var(--Primary-500, #ff354f);
+  background: var(--Primary-50, #fff6f6);
   padding: 10px 16px;
   color: var(--Gray-900, #101828);
   border-radius: 8px;

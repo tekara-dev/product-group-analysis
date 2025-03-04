@@ -1,3 +1,7 @@
+///<reference path="analyze.js" />
+
+const lockedSymbol = "🔒";
+
 const getActiveTable = (withRowIndex) => {
   var spreadsheet = SpreadsheetApp.getActiveSpreadsheet();
   return getTable(spreadsheet.getActiveSheet().getName(), withRowIndex);
@@ -228,7 +232,8 @@ const getProps = (row, partColumnIndex, headerRow) => {
     if (!val) continue;
     const hv = headerRow[i].replace("⁕", "").trim();
     if (hv.indexOf("*") === 0) continue;
-    if (hv.indexOf("🔒") > -1) continue;
+    if (hv.indexOf(lockedSymbol) > -1) continue;
+    if (hv.indexOf(analyzedSymbol) > -1) continue;
     if (hv === "Part number") continue;
 
     res.push({ name: hv, value: val });
