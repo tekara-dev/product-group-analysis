@@ -3,6 +3,7 @@ const onOpen = () => {
   ui.createMenu("Tekara: Аналитика")
     .addItem("Авторизация", "showAuthMenu")
     .addItem("Настройки листа", "showSettingsMenu")
+    .addItem("Заполнение цен", "showSetPriceMenu")
     .addItem("Оглавление", "showNavigationMenu")
     .addItem("Анализ листа", "showAnalizeMenu")
     .addSeparator()
@@ -57,6 +58,13 @@ const showAnalizeMenu = () => {
   showBaseMenu("analyze/analyze");
 };
 
+const showSetPriceMenu = () => {
+  const auth = postAuthMe();
+  if (!auth || !auth.id)
+    return showBaseMenu("auth/auth", { from: "setPrice/setPrice" });
+
+  showBaseMenu("setPrice/setPrice");
+};
 const showSettingsMenu = () => {
   const auth = postAuthMe();
   if (!auth || !auth.id)

@@ -38,7 +38,7 @@ Follow these rules when you write code:
 - Implement accessibility features on elements. For example, a tag should have a tabindex="0", aria-label, on:click, and on:keydown, and similar attributes.
 - Use consts instead of functions, for example, "const toggle = () =>". Also, define a type if possible, define a type for return value.
 - Use comments to explain why behind the code in more complex functions.
-- Destructure objects in parameters of functions.
+- Deconstruct objects in parameters of functions.
 
 ### Code Suggestions
 
