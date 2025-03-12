@@ -29,7 +29,11 @@ const postAuth = (login, password) => {
 };
 
 const postAuthMe = () => {
-  return getApiPoint(`${ApiUrl}/v2/auth/me`) || {};
+  try {
+    return getApiPoint(`${ApiUrl}/v2/auth/me`) || {};
+  } catch {
+    return {};
+  }
 };
 
 const getApiPoint = (point, method = "get", data, noApiKey) => {

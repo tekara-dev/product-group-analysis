@@ -1,4 +1,4 @@
-(() => {
+(async () => {
   var makerId = "";
   var categoryId = "";
   var modelId = "";
@@ -71,7 +71,7 @@
     startDdlLoader(makerChoices, "Синхронизуем производителя");
     await Promise.all([
       getServerData("setCellValue", ["CellMaker", makerId ? found.name : ""]),
-      getServerData("storeSheetSettings", [makerId, categoryId, modelId]),
+      getServerData("storeSheetSettings", [makerId, undefined, undefined]),
     ]);
     stopDdlLoader(makerChoices, "Синхронизуем производителя");
   };
@@ -93,7 +93,7 @@
         "CellCategory",
         categoryId ? found.name : "",
       ]),
-      getServerData("storeSheetSettings", [makerId, categoryId, modelId]),
+      getServerData("storeSheetSettings", [undefined, categoryId, undefined]),
     ]);
     stopDdlLoader(categoryChoices, "Синхронизуем категорию");
   };
@@ -111,7 +111,7 @@
 
     await Promise.all([
       getServerData("setCellValue", ["CellModel", nameToSet]),
-      getServerData("storeSheetSettings", [makerId, categoryId, modelId]),
+      getServerData("storeSheetSettings", [undefined, undefined, modelId]),
       ...(modelId
         ? [getServerData("setCellValue", ["CellCustomModel", nameToSet])]
         : []),
@@ -136,7 +136,7 @@
     const fill = (modelsArr) => {
       stopDdlLoader(modelChoices, "Получаем список моделей");
 
-      fillDdl(modelsArr, modelChoices, cellValues.model);
+      fillDdl(modelsArr, modelChoices);
 
       const selected = cellValues.model;
       if (!selected) return;
@@ -156,6 +156,7 @@
   };
 
   const setMakerValue = (val, noFire, noServerSet) => {
+    console.log("setMakerValue", val, noServerSet);
     const _val =
       val === "undefined" ? { name: "", id: "" } : val || { name: "", id: "" };
 
@@ -226,12 +227,12 @@
 
     makers = [...data];
 
-    fillDdl(makers, makerChoices, cellValues.maker);
+    fillDdl(makers, makerChoices);
 
     const selected = cellValues.maker;
     if (!selected) return;
 
-    setMakerValue({ name: selected, id: makerId });
+    setMakerValue({ name: selected, id: makerId }, false, true);
   };
 
   const initCategories = async () => {
@@ -242,17 +243,16 @@
 
     categories = [...data];
 
-    fillDdl(categories, categoryChoices, cellValues.category);
+    fillDdl(categories, categoryChoices);
 
     const selected = cellValues.category;
     if (!selected) return;
 
-    setCatValue({ name: selected, id: categoryId });
+    setCatValue({ name: selected, id: categoryId }, false, true);
   };
 
   const initFields = async () => {
-    initMakers();
-    initCategories();
+    await Promise.all([initMakers(), initCategories()]);
     modelInput.value = (cellValues.modelCustom || "").trim();
   };
 
@@ -266,7 +266,7 @@
       getServerData("getSettings"),
       getServerData("getStoredSheetSettings"),
     ]);
-    console.log(data, settings);
+    console.log("Настройки листа, refreshSettings", settings);
 
     modelId = settings.modelId;
     categoryId = settings.categoryId;
@@ -280,7 +280,7 @@
 
     if (!syncMode()) return;
 
-    initFields();
+    await initFields();
   };
 
   const poolChanges = async () => {
@@ -299,7 +299,7 @@
 
     if (!syncMode()) return;
 
-    if (makers.length === 0 || categories.length === 0) {
+    if (makers.length === 0) {
       initFields();
     } else {
       setMakerValue({ name: cellValues.maker, id: ids.makerId }, false, true);
@@ -323,11 +323,11 @@
   });
   modelChoices.disable();
 
-  refreshSettings();
-
   makerDdl.addEventListener("change", handleMakerChange);
   catDdl.addEventListener("change", handleCatChange);
   modelDdl.addEventListener("change", handleModelChange);
+
+  await refreshSettings();
 
   modelInput.addEventListener("input", () => {
     // Clear the previous timeout

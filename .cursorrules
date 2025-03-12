@@ -40,6 +40,11 @@ Follow these rules when you write code:
 - Use comments to explain why behind the code in more complex functions.
 - Destructure objects in parameters of functions.
 
+### Code Suggestions
+
+- Use "continue" statements to avoid nested ifs in loops.
+- If suggesting variable that is not defined, suggest to define it first.
+
 ### Project Overview
 
 This project is a Google Apps Script project that is used to manage a Google Sheet. Google Sheet contains data about Categories and Parts in Categories.
@@ -81,6 +86,7 @@ This project is a Google Apps Script project that is used to manage a Google She
   - `var(--Gray-900, #101828)` for Gray 900
 - Always include both the variable name and the fallback hex code
 - Use the color mappings from `docs/colors.md` file.
+- For gray colors, use Gray from Primary palette first. If it is not enough, use Gray from Warm palette.
 
 ### Project Structure
 

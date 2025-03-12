@@ -49,7 +49,18 @@ const storeSheetSettings = (makerId, categoryId, modelId) => {
   const sheet = SpreadsheetApp.getActiveSpreadsheet()
     .getActiveSheet()
     .getName();
-  setDocProps(getSheetSettingsKey(sheet), { makerId, categoryId, modelId });
+  const settings = getStoredSheetSettings();
+  //Сохраняем только те настройки, которые поданы в метод. Для того чтобы можно было обновлять только часть настроек
+  if (makerId) {
+    settings.makerId = makerId;
+  }
+  if (categoryId) {
+    settings.categoryId = categoryId;
+  }
+  if (modelId) {
+    settings.modelId = modelId;
+  }
+  setDocProps(getSheetSettingsKey(sheet), settings);
 };
 
 const getStoredSheetSettings = () => {

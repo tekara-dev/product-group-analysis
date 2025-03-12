@@ -145,7 +145,6 @@
   supplierDdl.style.display = "";
 
   if (errors.length > 0) {
-    console.log("Ошибки в дереве:", errors);
     printError(
       "В структуре листа данных есть ошибки. Пожалуйста, исправьте их или отключите анализ строк с ошибками. Ниже представлена структура листа. В индикаторах - количество ошибок в строках.",
       treeStructure
@@ -163,13 +162,14 @@
 
   btnAnal.addEventListener("click", async () => {
     btnAnal.disabled = true;
-    let isError = false;
+    // let isError = false;
     addLoader("Анализируем");
     try {
       const res = await getServerData("runAnalyze", [isAnalyzeErrors]);
+      console.log("Analyze result", res);
     } catch (e) {
       printError(e);
-      isError = true;
+      //   isError = true;
     }
     clearError();
     removeLoader("Анализируем");

@@ -50,13 +50,15 @@
       return key;
     };
 
-    const getServerData = (method, props, useCache) => {
+    const getServerData = (method, props, useCache, log = false) => {
       const key = getMethodCacheKey(method, props);
+      if (log) console.log("getServerData", key, method, props);
 
       return new Promise((resolve, reject) => {
         if (useCache && window.getCached) {
           const val = getCached(key);
           if (val) {
+            if (log) console.log("from cache", val);
             resolve(val);
             return;
           }
@@ -65,6 +67,7 @@
           .withSuccessHandler((data) => {
             if (useCache && window.setCached) setCached(key, data);
 
+            if (log) console.log("from server", data);
             resolve(data);
           })
           .withFailureHandler((err) => {

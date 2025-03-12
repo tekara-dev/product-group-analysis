@@ -3,6 +3,9 @@
 const supplierDataRowIndex = 2;
 const emptyCategorySymbol = "↴";
 const analyzedSymbol = "🔬";
+const groupedPropNameSeparator = "|";
+const maxCharsInPropName = 15;
+const oneCharWidth = 9;
 
 const testRunAnalyze = () => {
   const res = runAnalyze(true);
@@ -128,24 +131,143 @@ const runAnalyze = async (noErrors = false) => {
     req.rows = excludeErrors(treeData, errors);
   }
 
+  //Отправляем запрос на анализ
   const res = await postAnalyze(req, makerId, modelId, supplierId);
   const sheet = SpreadsheetApp.getActiveSpreadsheet().getActiveSheet();
   const { start: headerRowIndex } = getTableInfoData(sheet.getName());
+
+  //Это параметры размерности виртуальной таблицы
+  const maxRowIndex = getMaxRowIndex(req.rows);
+  const rowsCount = maxRowIndex;
+  const colsCount = 50;
+
+  //Это пустая виртуальная таблица, в которую пишутся значения ячеек. После заполнения, ее значения переписываются в лист.
+  const arrToFill = Array.from({ length: rowsCount }, () =>
+    Array.from({ length: colsCount }, () => "")
+  );
+
+  //Очищаем предыдущие анализированные значения
+  cleanAnalyzedProps(
+    sheet
+      .getRange(headerRowIndex + 1, 1, 1, sheet.getLastColumn())
+      .getValues()[0],
+    sheet
+  );
+
+  //Заполняем строку с данными поставщика
   if (res.supplier) {
-    fillRowProps(res.supplier, headerRowIndex, sheet, supplierDataRowIndex);
-    mergeAndFixCats(sheet, headerRowIndex);
+    fillRowProps(
+      res.supplier,
+      headerRowIndex,
+      sheet,
+      supplierDataRowIndex,
+      arrToFill
+    );
   }
-  fillAnalyzedProps(req.rows, res.rows, headerRowIndex, sheet);
+
+  //Если в результатах анализа есть свойства, присутствующие в сгруппированных свойствах поставщика, то заменяем их имена на имена сгруппированных свойств
+  const rows = prepareAnalyzedProps(res.rows, res.supplier.props);
+  //Заполняем строки с результатами анализа
+  fillAnalyzedProps(req.rows, rows, headerRowIndex, sheet, arrToFill);
+
+  const startFrom = cutArrayToFill(arrToFill, headerRowIndex);
+  if (arrToFill.length > 0) {
+    sheet
+      .getRange(1, startFrom + 1, arrToFill.length, arrToFill[0].length)
+      .setValues(arrToFill);
+  }
+
+  mergeAndFixCats(sheet, headerRowIndex);
+
+  //Возвращаем результаты анализа и входные данные. Для отладки
+  return { res, req, arrToFill, makerId, modelId, supplierId };
 };
 
-const fillAnalyzedProps = (data, analyzed, headerRowIndex, sheet) => {
+/**
+ * Возвращает максимальный индекс строки в дереве
+ * @param {{rowIndex: number, subs: {rowIndex: number}[]}[]} rows
+ * @returns {number}
+ */
+const getMaxRowIndex = (rows) => {
+  return rows.reduce((max, row) => {
+    const maxIndex = Math.max(max, row.rowIndex || 0);
+    if (row.subs) {
+      const subsMaxIndex = getMaxRowIndex(row.subs);
+      return Math.max(maxIndex, subsMaxIndex);
+    }
+    return maxIndex;
+  }, 0);
+};
+
+/**
+ * Обрезает массив arrToFill по пустым колонкам в строке headerRowIndex
+ * @param {number[][]} arrToFill - Массив с данными
+ * @param {number} headerRowIndex - Индекс строки с заголовками
+ * @returns {number} - Индекс первой не пустой колонки
+ */
+const cutArrayToFill = (arrToFill, headerRowIndex) => {
+  const header = arrToFill[headerRowIndex];
+  const start = header.findIndex((x) => x !== "");
+  let end = 0;
+  for (let i = start; i < header.length; i++) {
+    if (header[i] === "") {
+      end = i;
+      break;
+    }
+  }
+  for (let i = 0; i < arrToFill.length; i++) {
+    arrToFill[i] = arrToFill[i].slice(start, end);
+  }
+  return start;
+};
+
+/**
+ * Подготавливает категории данных анализа для заполенения в группированные категории
+ * @param {{props: {name: string, value: string}[]}[]} data - Данные анализа
+ * @param {{name: string, value: string}[]}[]} suppliesProps - Свойства поставщика
+ * @returns {{props: {name: string, value: string}[]}[]} - Подготовленные данные
+ */
+const prepareAnalyzedProps = (data, suppliesProps = []) => {
+  return data.map((row) => {
+    return {
+      ...row,
+      props: row.props.map((prop) => {
+        const groupedName = `${prop.name}${groupedPropNameSeparator}значение`;
+        if (suppliesProps.some((x) => x.name === groupedName)) {
+          return {
+            ...prop,
+            name: groupedName,
+          };
+        }
+        return prop;
+      }),
+      ...(row.subs
+        ? { subs: prepareAnalyzedProps(row.subs, suppliesProps) }
+        : {}),
+    };
+  });
+};
+
+const fillAnalyzedProps = (
+  data,
+  analyzed,
+  headerRowIndex,
+  sheet,
+  arrToFill
+) => {
   for (const row of data) {
     const { rowIndex, name, subs } = row;
     const analyzedRow = analyzed.find((x) => name === x.name);
     if (analyzedRow) {
-      fillRowProps(analyzedRow, headerRowIndex, sheet, rowIndex);
+      fillRowProps(analyzedRow, headerRowIndex, sheet, rowIndex, arrToFill);
       if (analyzedRow.subs && subs) {
-        fillAnalyzedProps(subs, analyzedRow.subs, headerRowIndex, sheet);
+        fillAnalyzedProps(
+          subs,
+          analyzedRow.subs,
+          headerRowIndex,
+          sheet,
+          arrToFill
+        );
       }
     }
   }
@@ -170,23 +292,31 @@ const getHeaderRows = (sheet, headerRowIndex) => {
  * @param {Sheet} sheet - Лист с данными
  * @param {number} rowIndex - Индекс строки в листе для заполнения значениями
  */
-const fillRowProps = ({ props }, headerRowIndex, sheet, rowIndex) => {
+const fillRowProps = (
+  { props },
+  headerRowIndex,
+  sheet,
+  rowIndex,
+  arrToFill
+) => {
   //Индексы строк с заголовками
   const firstHeaderRowIndex = headerRowIndex;
   const secondHeaderRowIndex = headerRowIndex + 1;
 
   //Если нет свойств, то выходим
-  if(!props || props.length === 0) return;
+  if (!props || props.length === 0) return;
 
   for (let prop of props) {
     //Строки с заголовками
-    let [firstHeaderRow, secondHeaderRow] = getHeaderRows(
-      sheet,
-      headerRowIndex
-    );
+    let firstHeaderRow = arrToFill[firstHeaderRowIndex - 1];
+    let secondHeaderRow = arrToFill[secondHeaderRowIndex - 1];
+    // let [firstHeaderRow, secondHeaderRow] = getHeaderRows(
+    //   sheet,
+    //   headerRowIndex
+    // );
 
     //Названия свойств. Например ['Категория', 'Значение1'] из 'Категория|Значение1'
-    const propNames = prop.name.split("|");
+    const propNames = prop.name.split(groupedPropNameSeparator);
     if (propNames.length === 2) {
       const firstPropName = propNames[0];
       //Индекс колонки с категорией
@@ -198,11 +328,11 @@ const fillRowProps = ({ props }, headerRowIndex, sheet, rowIndex) => {
         sheet
           .getRange(firstHeaderRowIndex, catColIndex + 1)
           .setValue(firstPropName);
+        //Заполняем виртуальную таблицу
+        arrToFill[firstHeaderRowIndex - 1][catColIndex] = firstPropName;
         //Обновляем строки с заголовками
-        [firstHeaderRow, secondHeaderRow] = getHeaderRows(
-          sheet,
-          headerRowIndex
-        );
+        firstHeaderRow = arrToFill[firstHeaderRowIndex - 1];
+        secondHeaderRow = arrToFill[secondHeaderRowIndex - 1];
       }
       const secondPropName = propNames[1]; //Это название свойства из данных
       const secondPropNameCat = formCatName(secondPropName); //Это название свойства для вывода. С символом 🔬
@@ -215,6 +345,7 @@ const fillRowProps = ({ props }, headerRowIndex, sheet, rowIndex) => {
           //Если колонка пустая, то считаем ее найденой.
           if (!propNameCat) {
             found = true;
+            secondCatColIndex = i;
             break;
           }
           //Если нашли, то запоминаем индекс и выходим из цикла
@@ -238,9 +369,14 @@ const fillRowProps = ({ props }, headerRowIndex, sheet, rowIndex) => {
       sheet
         .getRange(secondHeaderRowIndex, secondCatColIndex + 1)
         .setValue(secondPropNameCat);
+      //Заполняем виртуальную таблицу
+      arrToFill[secondHeaderRowIndex - 1][secondCatColIndex] =
+        secondPropNameCat;
 
       //Устанавливаем значение свойства в найденную или добавленную колонку
-      sheet.getRange(rowIndex, secondCatColIndex + 1).setValue(prop.value);
+      //sheet.getRange(rowIndex, secondCatColIndex + 1).setValue(prop.value);
+      //Заполняем виртуальную таблицу
+      arrToFill[rowIndex - 1][secondCatColIndex] = prop.value;
     } else if (propNames.length === 1) {
       let propNameCat = formCatName(propNames[0]); //Это название свойства для вывода. С символом 🔬
 
@@ -254,11 +390,17 @@ const fillRowProps = ({ props }, headerRowIndex, sheet, rowIndex) => {
         sheet
           .getRange(secondHeaderRowIndex, propColIndex + 1)
           .setValue(propNameCat);
+        //Заполняем виртуальную таблицу
+        arrToFill[secondHeaderRowIndex - 1][propColIndex] = propNameCat;
         sheet
           .getRange(firstHeaderRowIndex, propColIndex + 1)
           .setValue(emptyCategorySymbol);
+        //Заполняем виртуальную таблицу
+        arrToFill[firstHeaderRowIndex - 1][propColIndex] = emptyCategorySymbol;
       }
-      sheet.getRange(rowIndex, propColIndex + 1).setValue(prop.value);
+      //sheet.getRange(rowIndex, propColIndex + 1).setValue(prop.value);
+      //Заполняем виртуальную таблицу
+      arrToFill[rowIndex - 1][propColIndex] = prop.value;
     }
   }
 };
@@ -343,14 +485,41 @@ const mergeAndFixCats = (sheet, headerRowIndex) => {
 
   [firstHeaderRow, secondHeaderRow] = getHeaderRows(sheet, firstHeaderRowIndex);
 
+  const maxWidth = maxCharsInPropName * oneCharWidth;
   // Корректируем ширину колонок в соответствии с диапозонами для корректировки ширины
   for (const { start, length } of toFix) {
     const colWidth =
       length > 1 //Если диапазон объединения больше 1, то берем ширину первой колонки
-        ? firstHeaderRow[start - 1].length * 9
-        : secondHeaderRow[start - 1].length * 9; //Принимаем ширину одного символа за 9px
+        ? firstHeaderRow[start - 1].length * oneCharWidth
+        : secondHeaderRow[start - 1].length * oneCharWidth; //Принимаем ширину одного символа за 9px
     for (let i = start; i < start + length; i++) {
-      sheet.setColumnWidth(i, Math.round(colWidth / length));
+      sheet.setColumnWidth(
+        i,
+        Math.min(maxWidth, Math.round(colWidth / length))
+      );
     }
+  }
+
+  //Переносим текст во второй строке заголовка
+  sheet
+    .getRange(firstHeaderRowIndex + 1, 1, 1, sheet.getLastColumn())
+    .setWrap(true);
+  sheet.autoResizeRows(firstHeaderRowIndex + 1, 1);
+
+  //Объединяем строки заголовков, если они содержат пустую категорию
+  for (let i = 0; i < sheet.getLastColumn(); i++) {
+    const catCell = sheet.getRange(firstHeaderRowIndex, i + 1);
+    const prop = catCell.getValue();
+    if (prop.includes(emptyCategorySymbol)) {
+      catCell.setValue("");
+      sheet.getRange(firstHeaderRowIndex, i + 1, 2, 1).merge();
+    }
+  }
+};
+
+const cleanAnalyzedProps = (headerRow, sheet) => {
+  const first = headerRow.findIndex((x) => x.includes(analyzedSymbol));
+  if (first !== -1) {
+    sheet.deleteColumns(first + 1, sheet.getLastColumn() - first);
   }
 };

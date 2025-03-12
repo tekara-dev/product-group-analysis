@@ -1,0 +1,928 @@
+{
+  "rows": [
+    {
+      "name": "Engine parts",
+      "type": "Category",
+      "subs": [
+        {
+          "name": "Piston group",
+          "type": "Category",
+          "subs": [
+            {
+              "name": "Test 1",
+              "partNumber": "10021812",
+              "type": "Part",
+              "props": [
+                {
+                  "name": "Отношение к минимальной цене",
+                  "value": "0.2042066571370226669389422095"
+                },
+                {
+                  "name": "Отношение к медианной цене",
+                  "value": "0.2042066571370226669389422095"
+                }
+              ]
+            },
+            {
+              "name": "Test 2",
+              "partNumber": "10071642",
+              "type": "Part",
+              "props": [
+                {
+                  "name": "Отношение к минимальной цене",
+                  "value": "0.6821282401091405184174624829"
+                },
+                {
+                  "name": "Отношение к медианной цене",
+                  "value": "0.6821282401091405184174624829"
+                }
+              ]
+            },
+            {
+              "name": "Test 3",
+              "partNumber": "10167592",
+              "type": "Part",
+              "props": [
+                {
+                  "name": "Отношение к минимальной цене",
+                  "value": "3.367003367003367003367003367"
+                },
+                {
+                  "name": "Отношение к медианной цене",
+                  "value": "3.367003367003367003367003367"
+                }
+              ]
+            },
+            {
+              "name": "Test 4",
+              "partNumber": "10167595",
+              "type": "Part",
+              "props": [
+                {
+                  "name": "Отношение к минимальной цене",
+                  "value": "7.0422535211267605633802816901"
+                },
+                {
+                  "name": "Отношение к медианной цене",
+                  "value": "7.0422535211267605633802816901"
+                }
+              ]
+            },
+            {
+              "name": "Test 5",
+              "partNumber": "10167597",
+              "type": "Part",
+              "props": [
+                {
+                  "name": "Отношение к минимальной цене",
+                  "value": "10.752688172043010752688172043"
+                },
+                {
+                  "name": "Отношение к медианной цене",
+                  "value": "10.752688172043010752688172043"
+                }
+              ]
+            },
+            {
+              "name": "Test 6",
+              "partNumber": "10167602",
+              "type": "Part",
+              "props": [
+                {
+                  "name": "Отношение к минимальной цене",
+                  "value": "3.9682539682539682539682539683"
+                },
+                {
+                  "name": "Отношение к медианной цене",
+                  "value": "3.9682539682539682539682539683"
+                }
+              ]
+            },
+            {
+              "name": "Test 7",
+              "partNumber": "10249496",
+              "type": "Part",
+              "props": [
+                {
+                  "name": "Отношение к минимальной цене",
+                  "value": "0.2973535533749628308058281296"
+                },
+                {
+                  "name": "Отношение к медианной цене",
+                  "value": "0.2973535533749628308058281296"
+                }
+              ]
+            },
+            {
+              "name": "Test 8",
+              "partNumber": "10514130",
+              "type": "Part",
+              "props": [
+                {
+                  "name": "Отношение к минимальной цене",
+                  "value": "0.1370614035087719298245614035"
+                },
+                {
+                  "name": "Отношение к медианной цене",
+                  "value": "0.1370614035087719298245614035"
+                }
+              ]
+            },
+            {
+              "name": "Test 9",
+              "partNumber": "10574180",
+              "type": "Part",
+              "props": [
+                {
+                  "name": "Отношение к минимальной цене",
+                  "value": "13.698630136986301369863013699"
+                },
+                {
+                  "name": "Отношение к медианной цене",
+                  "value": "13.698630136986301369863013699"
+                }
+              ]
+            },
+            {
+              "name": "Test 10",
+              "partNumber": "10943554",
+              "type": "Part",
+              "props": [
+                {
+                  "name": "Отношение к минимальной цене",
+                  "value": "0.7304601899196493791088385683"
+                },
+                {
+                  "name": "Отношение к медианной цене",
+                  "value": "0.7304601899196493791088385683"
+                }
+              ]
+            },
+            {
+              "name": "Test 11",
+              "partNumber": "10989145",
+              "type": "Part",
+              "props": [
+                {
+                  "name": "Отношение к минимальной цене",
+                  "value": "0.396039603960396039603960396"
+                },
+                {
+                  "name": "Отношение к медианной цене",
+                  "value": "0.396039603960396039603960396"
+                }
+              ]
+            },
+            {
+              "name": "Test 12",
+              "partNumber": "11016612",
+              "type": "Part",
+              "props": [
+                {
+                  "name": "Отношение к минимальной цене",
+                  "value": "0.4203446826397646069777217318"
+                },
+                {
+                  "name": "Отношение к медианной цене",
+                  "value": "0.4203446826397646069777217318"
+                }
+              ]
+            },
+            {
+              "name": "Test 13",
+              "partNumber": "11041901",
+              "type": "Part",
+              "props": [
+                {
+                  "name": "Отношение к минимальной цене",
+                  "value": "3.3222591362126245847176079734"
+                },
+                {
+                  "name": "Отношение к медианной цене",
+                  "value": "3.3222591362126245847176079734"
+                }
+              ]
+            },
+            {
+              "name": "Test 14",
+              "partNumber": "11041902",
+              "type": "Part",
+              "props": [
+                {
+                  "name": "Отношение к минимальной цене",
+                  "value": "3.484320557491289198606271777"
+                },
+                {
+                  "name": "Отношение к медианной цене",
+                  "value": "3.484320557491289198606271777"
+                }
+              ]
+            },
+            {
+              "name": "Test 15",
+              "partNumber": "11041905",
+              "type": "Part",
+              "props": [
+                {
+                  "name": "Отношение к минимальной цене",
+                  "value": "3.1645569620253164556962025316"
+                },
+                {
+                  "name": "Отношение к медианной цене",
+                  "value": "3.1645569620253164556962025316"
+                }
+              ]
+            },
+            {
+              "name": "Test 16",
+              "partNumber": "11078548",
+              "type": "Part",
+              "props": [
+                {
+                  "name": "Отношение к минимальной цене",
+                  "value": "2.7548209366391184573002754821"
+                },
+                {
+                  "name": "Отношение к медианной цене",
+                  "value": "2.7548209366391184573002754821"
+                }
+              ]
+            },
+            {
+              "name": "Test 17",
+              "partNumber": "11078567",
+              "type": "Part",
+              "props": [
+                {
+                  "name": "Отношение к минимальной цене",
+                  "value": "3.0674846625766871165644171779"
+                },
+                {
+                  "name": "Отношение к медианной цене",
+                  "value": "3.0674846625766871165644171779"
+                }
+              ]
+            },
+            {
+              "name": "Test 18",
+              "partNumber": "11112311",
+              "type": "Part",
+              "props": [
+                {
+                  "name": "Отношение к минимальной цене",
+                  "value": "3.7735849056603773584905660377"
+                },
+                {
+                  "name": "Отношение к медианной цене",
+                  "value": "3.7735849056603773584905660377"
+                }
+              ]
+            },
+            {
+              "name": "Test 19",
+              "partNumber": "11112320",
+              "type": "Part",
+              "props": [
+                {
+                  "name": "Отношение к минимальной цене",
+                  "value": "2.6881720430107526881720430108"
+                },
+                {
+                  "name": "Отношение к медианной цене",
+                  "value": "2.6881720430107526881720430108"
+                }
+              ]
+            },
+            {
+              "name": "Test 20",
+              "partNumber": "11112327",
+              "type": "Part",
+              "props": [
+                {
+                  "name": "Отношение к минимальной цене",
+                  "value": "2.9411764705882352941176470588"
+                },
+                {
+                  "name": "Отношение к медианной цене",
+                  "value": "2.9411764705882352941176470588"
+                }
+              ]
+            },
+            {
+              "name": "Cylinder block",
+              "partNumber": "4932332",
+              "type": "Part",
+              "props": []
+            },
+            {
+              "name": "Cylinder head",
+              "partNumber": "3971767",
+              "type": "Part",
+              "props": []
+            },
+            {
+              "name": "Piston liner",
+              "partNumber": "3904166",
+              "type": "Part",
+              "props": []
+            },
+            {
+              "name": "Piston",
+              "partNumber": "XKDE-01945",
+              "type": "Part",
+              "props": []
+            },
+            {
+              "name": "Piston pin",
+              "partNumber": "XKDE-01272",
+              "type": "Part",
+              "props": []
+            },
+            {
+              "name": "Piston rings",
+              "partNumber": "XKDE-01946",
+              "type": "Part",
+              "props": []
+            },
+            {
+              "name": "Crankshaft",
+              "partNumber": "XKDE-02082",
+              "type": "Part",
+              "props": []
+            },
+            {
+              "name": "Thrust bearing",
+              "partNumber": "XKDE-02338",
+              "type": "Part",
+              "props": []
+            },
+            {
+              "name": "Main bearing",
+              "partNumber": "XKDE-00855",
+              "type": "Part",
+              "props": []
+            }
+          ],
+          "props": [
+            {
+              "name": "Отношение к минимальной цене|значение",
+              "value": "3.344639958513375853430453537"
+            },
+            {
+              "name": "Отношение к минимальной цене|отклонение",
+              "value": "3.44968396089366"
+            },
+            {
+              "name": "Отношение к медианной цене|значение",
+              "value": "3.344639958513375853430453537"
+            },
+            {
+              "name": "Отношение к медианной цене|отклонение",
+              "value": "3.44968396089366"
+            }
+          ]
+        },
+        {
+          "name": "Lubrication system",
+          "type": "Category",
+          "subs": [
+            {
+              "name": "Oil pump",
+              "partNumber": "YUBP-09202",
+              "type": "Part",
+              "props": []
+            }
+          ],
+          "props": []
+        },
+        {
+          "name": "Fuel system",
+          "type": "Category",
+          "subs": [
+            {
+              "name": "Fuel system",
+              "partNumber": "3975700",
+              "type": "Part",
+              "props": []
+            },
+            {
+              "name": "Fuel injector assy",
+              "partNumber": "YUBP-09312",
+              "type": "Part",
+              "props": []
+            }
+          ],
+          "props": []
+        },
+        {
+          "name": "Intake system",
+          "type": "Category",
+          "subs": [
+            {
+              "name": "Turbocharger",
+              "partNumber": "4038288",
+              "type": "Part",
+              "props": []
+            }
+          ],
+          "props": []
+        },
+        {
+          "name": "Exhaust system",
+          "type": "Category",
+          "subs": [
+            {
+              "name": "Exhaust manifold",
+              "partNumber": "XKDE-01208",
+              "type": "Part",
+              "props": []
+            }
+          ],
+          "props": []
+        },
+        {
+          "name": "Timing gear system",
+          "type": "Category",
+          "subs": [
+            {
+              "name": "Exhaust valve",
+              "partNumber": "YUBP-01169",
+              "type": "Part",
+              "props": []
+            },
+            {
+              "name": "Intake valve",
+              "partNumber": "YUBP-01171",
+              "type": "Part",
+              "props": []
+            },
+            {
+              "name": "Valve push-rod",
+              "partNumber": "YUBP-01229",
+              "type": "Part",
+              "props": []
+            },
+            {
+              "name": "Camshaft",
+              "partNumber": "XKDE-00906",
+              "type": "Part",
+              "props": []
+            }
+          ],
+          "props": []
+        },
+        {
+          "name": "Electric system",
+          "type": "Category",
+          "subs": [
+            {
+              "name": "Engine control unit (ECU)",
+              "partNumber": "XKDE-00338",
+              "type": "Part",
+              "props": []
+            }
+          ],
+          "props": []
+        },
+        {
+          "name": "Rubber parts",
+          "type": "Category",
+          "subs": [
+            {
+              "name": "Cylinder head gasket",
+              "partNumber": "XKDE-01093",
+              "type": "Part",
+              "props": []
+            },
+            {
+              "name": "Valve cover gasket",
+              "partNumber": "XKDE-02626",
+              "type": "Part",
+              "props": []
+            },
+            {
+              "name": "Oil pan gasket",
+              "partNumber": "XKDE-02700",
+              "type": "Part",
+              "props": []
+            },
+            {
+              "name": "Crankshaft seal front",
+              "partNumber": "XKDE-02098",
+              "type": "Part",
+              "props": []
+            },
+            {
+              "name": "Crankshaft seal rear",
+              "partNumber": "YUBP-00153",
+              "type": "Part",
+              "props": []
+            }
+          ],
+          "props": []
+        },
+        {
+          "name": "Cooling system",
+          "type": "Category",
+          "subs": [
+            {
+              "name": "Engine radiator",
+              "partNumber": "XKDE-00981",
+              "type": "Part",
+              "props": []
+            }
+          ],
+          "props": []
+        }
+      ],
+      "props": [
+        {
+          "name": "Отношение к минимальной цене|значение",
+          "value": "3.344639958513375853430453537"
+        },
+        {
+          "name": "Отношение к минимальной цене|отклонение",
+          "value": "3.44968396089366"
+        },
+        {
+          "name": "Отношение к медианной цене|значение",
+          "value": "3.344639958513375853430453537"
+        },
+        {
+          "name": "Отношение к медианной цене|отклонение",
+          "value": "3.44968396089366"
+        }
+      ]
+    },
+    {
+      "name": "Hydraulc parts",
+      "type": "Category",
+      "subs": [
+        {
+          "name": "Main pump",
+          "type": "Category",
+          "subs": [],
+          "props": []
+        },
+        {
+          "name": "Main control valve",
+          "type": "Category",
+          "subs": [],
+          "props": []
+        },
+        {
+          "name": "Final drive w/motor",
+          "type": "Category",
+          "subs": [],
+          "props": []
+        },
+        {
+          "name": "Travel motor",
+          "type": "Category",
+          "subs": [],
+          "props": []
+        },
+        {
+          "name": "Swing drive w/motor",
+          "type": "Category",
+          "subs": [],
+          "props": []
+        },
+        {
+          "name": "Swing motor",
+          "type": "Category",
+          "subs": [],
+          "props": []
+        },
+        {
+          "name": "Swing bearing",
+          "type": "Category",
+          "subs": [],
+          "props": []
+        },
+        {
+          "name": "Control joystick",
+          "type": "Category",
+          "subs": [],
+          "props": []
+        },
+        {
+          "name": "Bucket cylinder",
+          "type": "Category",
+          "subs": [],
+          "props": []
+        },
+        {
+          "name": "Arm cylinder",
+          "type": "Category",
+          "subs": [],
+          "props": []
+        },
+        {
+          "name": "Boom cylinder",
+          "type": "Category",
+          "subs": [],
+          "props": []
+        },
+        {
+          "name": "Blade lift cylinder",
+          "type": "Category",
+          "subs": [],
+          "props": []
+        },
+        {
+          "name": "Blade tilt cylinder",
+          "type": "Category",
+          "subs": [],
+          "props": []
+        },
+        {
+          "name": "Steering cylinder",
+          "type": "Category",
+          "subs": [],
+          "props": []
+        },
+        {
+          "name": "Oil cooler",
+          "type": "Category",
+          "subs": [],
+          "props": []
+        },
+        {
+          "name": "Turning joint",
+          "type": "Category",
+          "subs": [],
+          "props": []
+        },
+        {
+          "name": "Transmission pump",
+          "type": "Category",
+          "subs": [],
+          "props": []
+        },
+        {
+          "name": "Steering pump (orbitrol)",
+          "type": "Category",
+          "subs": [],
+          "props": []
+        },
+        {
+          "name": "Rubber parts",
+          "type": "Category",
+          "subs": [],
+          "props": []
+        }
+      ],
+      "props": []
+    },
+    {
+      "name": "Undercarriage parts",
+      "type": "Category",
+      "subs": [
+        {
+          "name": "Track group assy",
+          "type": "Category",
+          "subs": [],
+          "props": []
+        },
+        {
+          "name": "Sprocket",
+          "type": "Category",
+          "subs": [],
+          "props": []
+        },
+        {
+          "name": "Segment group",
+          "type": "Category",
+          "subs": [],
+          "props": []
+        },
+        {
+          "name": "Track roller SF",
+          "type": "Category",
+          "subs": [],
+          "props": []
+        },
+        {
+          "name": "Track roller DF",
+          "type": "Category",
+          "subs": [],
+          "props": []
+        },
+        {
+          "name": "Carrier roller",
+          "type": "Category",
+          "subs": [],
+          "props": []
+        },
+        {
+          "name": "Idler",
+          "type": "Category",
+          "subs": [],
+          "props": []
+        },
+        {
+          "name": "Track tensioner",
+          "type": "Category",
+          "subs": [],
+          "props": []
+        }
+      ],
+      "props": []
+    },
+    {
+      "name": "Work equipment",
+      "type": "Category",
+      "subs": [
+        {
+          "name": "Bucket",
+          "type": "Category",
+          "subs": [],
+          "props": []
+        },
+        {
+          "name": "Bucket link",
+          "type": "Category",
+          "subs": [],
+          "props": []
+        },
+        {
+          "name": "Arm",
+          "type": "Category",
+          "subs": [],
+          "props": []
+        },
+        {
+          "name": "Boom",
+          "type": "Category",
+          "subs": [],
+          "props": []
+        },
+        {
+          "name": "Cutting tools",
+          "type": "Category",
+          "subs": [],
+          "props": []
+        },
+        {
+          "name": "Additional work equipment",
+          "type": "Category",
+          "subs": [],
+          "props": []
+        }
+      ],
+      "props": []
+    },
+    {
+      "name": "Filters",
+      "type": "Category",
+      "subs": [
+        {
+          "name": "Hydraulic filter",
+          "type": "Category",
+          "subs": [
+            {
+              "name": "Engine oil filter",
+              "partNumber": "11N8-70110",
+              "type": "Part",
+              "props": []
+            }
+          ],
+          "props": []
+        },
+        {
+          "name": "Fuel filter",
+          "type": "Category",
+          "subs": [
+            {
+              "name": "Fuel filter primary",
+              "partNumber": "11LG-70010",
+              "type": "Part",
+              "props": []
+            }
+          ],
+          "props": []
+        },
+        {
+          "name": "Air filter",
+          "type": "Category",
+          "subs": [],
+          "props": []
+        }
+      ],
+      "props": []
+    },
+    {
+      "name": "Transmission",
+      "type": "Category",
+      "subs": [
+        {
+          "name": "Front axle assy",
+          "type": "Category",
+          "subs": [],
+          "props": []
+        },
+        {
+          "name": "Rear axle assy",
+          "type": "Category",
+          "subs": [],
+          "props": []
+        },
+        {
+          "name": "Drive shaft group",
+          "type": "Category",
+          "subs": [],
+          "props": []
+        },
+        {
+          "name": "Gearbox assy",
+          "type": "Category",
+          "subs": [],
+          "props": []
+        },
+        {
+          "name": "Brake system",
+          "type": "Category",
+          "subs": [],
+          "props": []
+        }
+      ],
+      "props": []
+    },
+    {
+      "name": "Tyres and discs",
+      "type": "Category",
+      "subs": [
+        {
+          "name": "Pneumatic tyre",
+          "type": "Category",
+          "subs": [],
+          "props": []
+        },
+        {
+          "name": "Solid tyre",
+          "type": "Category",
+          "subs": [],
+          "props": []
+        },
+        {
+          "name": "Wheel disc",
+          "type": "Category",
+          "subs": [],
+          "props": []
+        },
+        {
+          "name": "Wheel stud",
+          "type": "Category",
+          "subs": [],
+          "props": []
+        },
+        {
+          "name": "Wheel nut",
+          "type": "Category",
+          "subs": [],
+          "props": []
+        },
+        {
+          "name": "Air tube",
+          "type": "Category",
+          "subs": [],
+          "props": []
+        }
+      ],
+      "props": []
+    }
+  ],
+  "supplier": {
+    "props": [
+      {
+        "name": "Отношение к минимальной цене|значение",
+        "value": "3.344639958513375853430453537"
+      },
+      {
+        "name": "Отношение к минимальной цене|отклонение",
+        "value": "3.44968396089366"
+      },
+      {
+        "name": "Отношение к медианной цене|значение",
+        "value": "3.344639958513375853430453537"
+      },
+      {
+        "name": "Отношение к медианной цене|отклонение",
+        "value": "3.44968396089366"
+      },
+      {
+        "name": "Количество оцениваемых запчастей",
+        "value": "20"
+      },
+      {
+        "name": "Количество меньше минимального",
+        "value": "0"
+      },
+      {
+        "name": "Количество меньше медианного",
+        "value": "0"
+      }
+    ]
+  }
+}
