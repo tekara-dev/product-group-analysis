@@ -131,10 +131,10 @@ const syncSheetName = (sheet) => {
 };
 
 const getMakers = () =>
-  getApiPoint("https://offers-moder-api.tkr.dev/api/catalog/makers");
+  getOffersApiPoint("/catalog/makers");
 const getCategories = () =>
-  getApiPoint("https://offers-moder-api.tkr.dev/api/catalog/categories");
+  getOffersApiPoint("/catalog/categories");
 const getModels = (makerId, categoryId) =>
-  getApiPoint(
-    `https://offers-moder-api.tkr.dev/api/catalog/models?makerId=${makerId}&categoryId=${categoryId}`
+  getOffersApiPoint(
+    `/catalog/models?makerId=${makerId}&categoryId=${categoryId}`
   );

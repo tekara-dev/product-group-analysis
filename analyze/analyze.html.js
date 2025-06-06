@@ -98,7 +98,12 @@
       getServerData("getStoredSupplierId"),
     ]);
 
-    suppliers = [...data];
+    suppliers = [...(data || [])]
+      .map(({ brandName, id, remark }) => ({
+        name: remark ? `${brandName} (${remark})` : brandName, //Приклеиваем remark к имени
+        id,
+      }))
+      .sort((a, b) => a.name.localeCompare(b.name)); //Сортируем по имени
     supplierId = sId;
 
     fillDdl(suppliers, supplierChoices);

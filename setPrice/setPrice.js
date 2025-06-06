@@ -1,4 +1,6 @@
 ///<reference path="../auth/auth.js" />
+///<reference path="../lib/api.js" />
+
 const getPrices = async (supplierId) => {
   const sheet = SpreadsheetApp.getActiveSpreadsheet().getActiveSheet();
   const { data, start, partColumnIndex } = getTableInfoData(sheet.getName());
@@ -9,13 +11,11 @@ const getPrices = async (supplierId) => {
       .map((x) => x[0]) || []
   ).filter((x) => x);
 
-  const res = getPricesStub(partNumbers);
-
-  //   const res = await getApiPoint(
-  //     `https://offers-moder-api.tkr.dev/api/priceAnalysis/pricesForPartNumbers?supplierId=${supplierId}`,
-  //     "POST",
-  //     partNumbers
-  //   );
+  const res = await getOffersApiPoint(
+    `/priceAnalyzer/pricesForPartNumbers?supplierId=${supplierId}`,
+    "POST",
+    partNumbers
+  );
 
   const colIndex = data[start].findIndex((x) => x === "Валюта 🔒");
   const arrToFill = Array.from({ length: data.length - start - 1 }, () =>
@@ -52,4 +52,14 @@ const getPricesStub = (partNumbers) => {
     price: Math.floor(Math.random() * 10000),
     currency: "RUB",
   }));
+};
+
+const clearPrices = () => {
+  const sheet = SpreadsheetApp.getActiveSpreadsheet().getActiveSheet();
+  const { data, start } = getTableInfoData(sheet.getName());
+  const colIndex = data[start].findIndex((x) => x === "Валюта 🔒");
+  if (colIndex === -1) return;
+  sheet
+    .getRange(start + 2, colIndex + 1, data.length - start - 1, 2)
+    .clearContent();
 };

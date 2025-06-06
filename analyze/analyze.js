@@ -1,4 +1,5 @@
 ///<reference path="listTable.js" />
+///<reference path="../lib/api.js" />
 
 const supplierDataRowIndex = 2;
 const emptyCategorySymbol = "↴";
@@ -13,12 +14,16 @@ const testRunAnalyze = () => {
 };
 
 const getSuppliers = () => {
-  return getApiPoint("https://offers-moder-api.tkr.dev/api/catalog/suppliers");
+  const meta = getCsApiPoint(`/v1/companies/meta?types=supplier&include=contacts`);
+  let companies = getCsApiPoint(
+    `/v1/companies?offset=0&limit=${Number(meta.total || 10000)}&types=supplier&include=contacts&search=`
+  );
+  return companies;
 };
 
 const postAnalyze = (data, makerId, modelId, supplierId) => {
-  return getApiPoint(
-    `https://offers-moder-api.tkr.dev/api/priceAnalyzer/analyzeFromComparisonTree?makerId=${makerId}&modelId=${modelId}&supplierId=${supplierId}`,
+  return getOffersApiPoint(
+    `/priceAnalyzer/analyzeFromComparisonTree?makerId=${makerId}&modelId=${modelId}&supplierId=${supplierId}`,
     "post",
     data
   );

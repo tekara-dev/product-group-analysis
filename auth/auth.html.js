@@ -22,9 +22,8 @@
       cntInfo.style.display = "";
 
       const { firstName = "", lastName = "" } = meRes.contact || {};
-      cntInfo.getElementsByTagName(
-        "span"
-      )[0].innerHTML = `${firstName} ${lastName}`;
+      const nameToShow = firstName || lastName ? `${firstName} ${lastName}` : meRes.username || meRes.email || "неизвестный пользователь";
+      cntInfo.getElementsByTagName("span")[0].innerHTML = nameToShow;
 
       if (pageData && pageData.from) {
         redirect(pageData.from);

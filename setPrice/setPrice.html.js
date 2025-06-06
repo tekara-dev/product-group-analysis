@@ -36,7 +36,11 @@
       getServerData("getStoredSupplierId"),
     ]);
 
-    suppliers = [...data];
+    suppliers = [...(data || [])].map(({ brandName, id, remark }) => ({
+      name: remark ? `${brandName} (${remark})` : brandName,
+      id,
+    }))
+      .sort((a, b) => a.name.localeCompare(b.name));
     supplierId = sId;
 
     fillDdl(suppliers, supplierChoices);

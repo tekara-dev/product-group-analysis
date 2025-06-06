@@ -1,11 +1,19 @@
+///<reference path="analyze/analyze.js" />
+
 const onOpen = () => {
   const ui = SpreadsheetApp.getUi();
   ui.createMenu("Tekara: Аналитика")
+    .addItem("Настройки API", "showApiSettingsMenu")
+    .addSeparator()
     .addItem("Авторизация", "showAuthMenu")
     .addItem("Настройки листа", "showSettingsMenu")
-    .addItem("Заполнение цен", "showSetPriceMenu")
     .addItem("Оглавление", "showNavigationMenu")
+    .addSeparator()
     .addItem("Анализ листа", "showAnalizeMenu")
+    .addItem("Очистить данные анализа", "clearAnalizeData")
+    .addSeparator()
+    .addItem("Заполнение цен", "showSetPriceMenu")
+    .addItem("Очистить цены поставщика", "clearPrices")
     .addSeparator()
     .addItem("Сгруппировать лист", "groupActiveList")
     .addItem("Убрать группировку", "unGroupAll")
@@ -18,6 +26,13 @@ const getContent = (filename) => {
   } catch {
     return "";
   }
+};
+
+const clearAnalizeData = () => {
+  const sheet = SpreadsheetApp.getActiveSpreadsheet().getActiveSheet();
+  const { start: headerRowIndex } = getTableInfoData(sheet.getName());
+  const headerRow = getHeaderRows(sheet, headerRowIndex)[1];
+  cleanAnalyzedProps(headerRow, sheet);
 };
 
 const onSelectionChange = (e) => {
@@ -56,6 +71,10 @@ const showAnalizeMenu = () => {
     return showBaseMenu("auth/auth", { from: "analyze/analyze" });
 
   showBaseMenu("analyze/analyze");
+};
+
+const showApiSettingsMenu = () => {
+  showBaseMenu("apiSettings/apiSettings");
 };
 
 const showSetPriceMenu = () => {
