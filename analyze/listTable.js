@@ -1,13 +1,49 @@
 ///<reference path="analyze.js" />
 
 const lockedSymbol = "🔒";
+const excludedSymbols = [lockedSymbol, "📅", analyzedSymbol];
+const priceHeaderName = "Цена 🔒";
 
 const getActiveTable = (withRowIndex) => {
   var spreadsheet = SpreadsheetApp.getActiveSpreadsheet();
   return getTable(spreadsheet.getActiveSheet().getName(), withRowIndex);
 };
+
+const setTablePrice = (table) => {
+  const priceSetting = getActivePriceType() || "Цена поставщика";
+  if (priceSetting === "Цена") return;
+  setLevelPrice(table, priceSetting);
+};
+
+/**
+ * Устанавливает значение prop "Цена" в зависимости от настройки
+ * @param {{subs:[], props:[]}[]} level Список нод
+ * @param {'priceCustomToggle' | 'priceSupplierToggle' | 'priceBothToggle'} setting Настройки цены
+ * @returns {void}
+ */
+const setLevelPrice = (level, setting) => {
+  if (setting === "Цена") return level;
+  for (let i = 0; i < level.length; i++) {
+    const item = level[i];
+    if (item.subs) setLevelPrice(item.subs, setting);
+    const priceProp = item.props.find((x) => x.name === "Цена");
+    const priceSupplierProp = item.props.find(
+      (x) => x.name === priceHeaderName
+    );
+
+    if (setting === "Цена поставщика") {
+      const nv = (priceSupplierProp || { value: "" }).value;
+      if (priceProp) priceProp.value = nv;
+      else item.props.push({ name: "Цена", value: nv });
+
+      continue;
+    }
+  }
+};
+
 const getValidatedActiveTable = () => {
   const table = getActiveTable(true);
+  setTablePrice(table);
   const errors = validateTree(table);
   return { table, errors };
 };
@@ -232,8 +268,12 @@ const getProps = (row, partColumnIndex, headerRow) => {
     if (!val) continue;
     const hv = headerRow[i].replace("⁕", "").trim();
     if (hv.indexOf("*") === 0) continue;
-    if (hv.indexOf(lockedSymbol) > -1) continue;
-    if (hv.indexOf(analyzedSymbol) > -1) continue;
+    if (
+      excludedSymbols.some((x) => hv.indexOf(x) > -1) &&
+      hv.indexOf(priceHeaderName) === -1
+    )
+      continue; //Если символ в списке исключений и не цена, пропускаем
+    // if (hv.indexOf(analyzedSymbol) > -1) continue;
     if (hv === "Part number") continue;
 
     res.push({ name: hv, value: val });

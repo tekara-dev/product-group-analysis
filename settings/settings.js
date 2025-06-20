@@ -3,6 +3,30 @@ const Cells = {
   CellCategory: [2, 3],
   CellModel: [2, 4],
   CellCustomModel: [2, 5],
+  CelPriceType: [2, 6],
+};
+
+const getActivePriceType = () => {
+  const sheet = SpreadsheetApp.getActiveSpreadsheet().getActiveSheet();
+  return getPriceType(sheet);
+};
+
+const getPriceType = (sheet) => {
+  const priceTypeCell = sheet.getRange(Cells.CelPriceType[0], Cells.CelPriceType[1]);
+  return priceTypeCell.getValue() || "Цена поставщика";
+};
+
+const setActivePriceType = (priceType) => { 
+  const sheet = SpreadsheetApp.getActiveSpreadsheet().getActiveSheet();
+  setPriceType(sheet, priceType);
+};
+
+const setPriceType = (sheet, priceType) => {
+  const priceTypeCell = sheet.getRange(
+    Cells.CelPriceType[0],
+    Cells.CelPriceType[1]
+  );
+  priceTypeCell.setValue(priceType);
 };
 
 const getSettings = () => {

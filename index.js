@@ -31,8 +31,8 @@ const getContent = (filename) => {
 const clearAnalizeData = () => {
   const sheet = SpreadsheetApp.getActiveSpreadsheet().getActiveSheet();
   const { start: headerRowIndex } = getTableInfoData(sheet.getName());
-  const headerRow = getHeaderRows(sheet, headerRowIndex)[1];
-  cleanAnalyzedProps(headerRow, sheet);
+
+  cleanAnalyzedProps(getHeaderRows(sheet, headerRowIndex), sheet);
 };
 
 const onSelectionChange = (e) => {

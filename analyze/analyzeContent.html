@@ -1,10 +1,37 @@
 <h1>Анализ листа:</h1>
+<div class="toggleCnt flex-align-start">
+  <label>Цена, учитываемая в&nbsp;анализе:</label>
+  <span class="plate" id="priceType">...</span>
+</div>
 <p id="treeStructure" style="display: none"></p>
-<div class="tree" id="tree" style="display: none"></div>
+<div class="toggleCnt">
+  <div class="skeleton" id="treeSkeleton"></div>
+  <div class="tree" id="tree" style="display: none"></div>
+</div>
 <div class="inputCnt" id="supplier" style="display: none">
   <label>Поставщик для анализа:</label>
+  <p>Предложения выбранного поставщика будут исключены из&nbsp;анализа.</p>
   <select id="ddlSupplier" style="display: none"></select>
 </div>
-<div id="toggle" style="display: none">Не анализировать строки с ошибками</div>
+<div id="analyzeSettings" style="display: none" class="toggleCnt">
+  <label>Выберите область сравнения:</label>
+  <p>
+    Отметьте всех поставщиков, которые будут учитываться в&nbsp;анализе. Если
+    ничего не отмечено, то&nbsp;будут учитываться все поставщики.
+  </p>
+  <div class="toggleCnt">
+    <div
+      class="skeleton"
+      id="analyzeSettingsSkeleton"
+      style="display: none"
+    ></div>
+    <div id="sourceRussian">Поставщики из&nbsp;России</div>
+    <div id="sourceForeign">Поставщики из&nbsp;других стран</div>
+    <div id="sourceShadow">Теневые предложения</div>
+  </div>
+</div>
+<div id="toggle" style="display: none">
+  Игнорировать строки с&nbsp;ошибками и&nbsp;перейти к&nbsp;анализу
+</div>
 <button id="btnAnalyze" style="display: none">Анализировать</button>
 <p id="error" style="display: none"></p>

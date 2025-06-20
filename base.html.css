@@ -5,8 +5,10 @@
 }
 
 body {
-  background: var(--Primary-700, #e2032b);
-  color: #fff;
+  /* background: var(--Primary-700, #e2032b); */
+  /* color: #fff; */
+  background-color: #fff;
+  color: #101828;
   font-family: "Jost";
   font-size: 14px;
   line-height: 20px;
@@ -16,6 +18,17 @@ h1 {
   font-weight: 400;
   font-size: 36px;
   line-height: 44px;
+}
+
+h2 {
+  font-weight: 400;
+  font-size: 20px;
+  line-height: 28px;
+}
+
+label {
+  font-weight: 500;
+  color: var(--Primary-700, #E2032B);
 }
 
 .content {
@@ -65,8 +78,8 @@ h1 {
   position: relative;
 }
 .input {
-  border: 1px solid var(--Primary-300, #f87f8e);
-  color: #fff;
+  border: 1px solid var(--Gray-600, #475467);
+  color: var(--Gray-900, #101828);
   border-radius: 8px;
   background-color: transparent;
   width: 100%;
@@ -79,20 +92,24 @@ h1 {
 
 button {
   border: none;
-  background: var(--Primary-50, #fff6f6);
+  /* background: var(--Primary-50, #fff6f6); */
+  background-color: var(--Primary-600, #FF002C);
   padding: 10px 16px;
-  color: var(--Gray-900, #101828);
+  /* color: var(--Gray-900, #101828); */
+  color: #fff;
   border-radius: 8px;
   cursor: pointer;
 }
 button:hover {
-  background-color: var(--Primary-50, #fff6f6);
+  /* background-color: var(--Primary-50, #fff6f6); */
+  background-color: var(--Primary-700, #E2032B);
 }
 button:active {
-  background-color: var(--Primary-100, #ffebed);
+  /* background-color: var(--Primary-100, #ffebed); */
+  background-color: var(--Primary-500, #FF354F);
 }
 button:disabled {
-  background: var(--Primary-300, #f87f8e);
+  background: var(--Gray-500, #667085);
 }
 
 @keyframes spin-icon {
@@ -122,4 +139,32 @@ button:disabled {
   display: block;
 
   animation: spin-icon 1s linear infinite;
+}
+.toggleCnt {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  position: relative;
+}
+
+.skeleton {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  /* background-color: var(--Primary-500, #ff354f); */
+  background-color: #EAECF0;
+  z-index: 10;
+  border-radius: 8px;
+}
+.flex-align-start {
+  align-items: flex-start;
+}
+.plate {
+  background-color: var(--Gray-100, #F2F4F7);
+  border-radius: 12px;
+  padding: 2px 10px;
+  line-height: 20px;
+  color: var(--Gray-900, #101828);
 }

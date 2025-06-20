@@ -107,7 +107,7 @@
   vertical-align: top;
   width: 100%;
   padding: 6px 10px;
-  border: 1px solid #f87f8e;
+  border: 1px solid var(--Gray-600, #475467);
   border-radius: 8px;
   overflow: hidden;
 }

@@ -14,19 +14,35 @@ const testRunAnalyze = () => {
 };
 
 const getSuppliers = () => {
-  const meta = getCsApiPoint(`/v1/companies/meta?types=supplier&include=contacts`);
+  const meta = getCsApiPoint(
+    `/v1/companies/meta?types=supplier&include=contacts`
+  );
   let companies = getCsApiPoint(
-    `/v1/companies?offset=0&limit=${Number(meta.total || 10000)}&types=supplier&include=contacts&search=`
+    `/v1/companies?offset=0&limit=${Number(
+      meta.total || 10000
+    )}&types=supplier&include=contacts&search=`
   );
   return companies;
 };
 
-const postAnalyze = (data, makerId, modelId, supplierId) => {
-  return getOffersApiPoint(
-    `/priceAnalyzer/analyzeFromComparisonTree?makerId=${makerId}&modelId=${modelId}&supplierId=${supplierId}`,
-    "post",
-    data
-  );
+const postAnalyze = (data, makerId, modelId, supplierId, source) => {
+  var sourceStrings = [];
+
+  if (source.sourceRussian) sourceStrings.push("RussiaLocated");
+  if (source.sourceForeign) sourceStrings.push("ChinaLocated");
+  if (source.sourceShadow) sourceStrings.push("ShadowOffer");
+
+  var sourceQuery = `&source=${sourceStrings.join("&source=")}`;
+
+  const url = `/priceAnalyzer/analyzeFromComparisonTree?makerId=${makerId}&modelId=${modelId}&supplierId=${supplierId}${sourceQuery}`;
+  console.log("url:", url);
+  console.log("data:", JSON.stringify(data));
+
+  try {
+    return { result: getOffersApiPoint(url, "post", data), url, data };
+  } catch (e) {
+    return { result: [], url, data, error: e };
+  }
 };
 
 const getSupplierIdStoreKey = (sheetName) => `${sheetName}_supplierId`;
@@ -78,6 +94,11 @@ const validateTree = (tree) => {
       if (!currencyProp || !currencyProp.value) {
         errors.push({ rowIndex, name, error: "Валюта не заполнена" });
       }
+
+      const weightProp = props.find(({ name }) => name === "Вес (г.)");
+      if (!weightProp || !weightProp.value) {
+        errors.push({ rowIndex, name, error: "Вес не заполнен" });
+      }
     }
 
     if (subs) {
@@ -119,6 +140,8 @@ const excludeErrors = (tree, errors) => {
  */
 const runAnalyze = async (noErrors = false) => {
   const treeData = getActiveTable(true);
+  setTablePrice(treeData);
+
   const req = {
     settings: getCustomParams(),
     rows: treeData,
@@ -136,8 +159,13 @@ const runAnalyze = async (noErrors = false) => {
     req.rows = excludeErrors(treeData, errors);
   }
 
+  const source = getDocProps("analyzeSourceSettings") || {};
+
   //Отправляем запрос на анализ
-  const res = await postAnalyze(req, makerId, modelId, supplierId);
+  const { result: res, url, data: requestData, error } = await postAnalyze(req, makerId, modelId, supplierId, source);
+  if (error) {
+    return { error: error, url, requestData };
+  }
   const sheet = SpreadsheetApp.getActiveSpreadsheet().getActiveSheet();
   const { start: headerRowIndex } = getTableInfoData(sheet.getName());
 
@@ -153,9 +181,7 @@ const runAnalyze = async (noErrors = false) => {
 
   //Очищаем предыдущие анализированные значения
   cleanAnalyzedProps(
-    sheet
-      .getRange(headerRowIndex + 1, 1, 1, sheet.getLastColumn())
-      .getValues()[0],
+    getHeaderRows(sheet, headerRowIndex),
     sheet
   );
 
@@ -185,7 +211,7 @@ const runAnalyze = async (noErrors = false) => {
   mergeAndFixCats(sheet, headerRowIndex);
 
   //Возвращаем результаты анализа и входные данные. Для отладки
-  return { res, req, arrToFill, makerId, modelId, supplierId };
+  return { res, req, arrToFill, makerId, modelId, supplierId, url, requestData };
 };
 
 /**
@@ -522,9 +548,12 @@ const mergeAndFixCats = (sheet, headerRowIndex) => {
   }
 };
 
-const cleanAnalyzedProps = (headerRow, sheet) => {
-  const first = headerRow.findIndex((x) => x.includes(analyzedSymbol));
-  if (first !== -1) {
-    sheet.deleteColumns(first + 1, sheet.getLastColumn() - first);
+const cleanAnalyzedProps = (headerRows, sheet) => {
+  let first = headerRows[0].findIndex((x) => x.includes(analyzedSymbol));
+  let second = headerRows[1].findIndex((x) => x.includes(analyzedSymbol));
+  const start = first !== -1 && second !== -1 ? Math.min(first, second) : first !== -1 ? first : second !== -1 ? second : -1;
+  const end = sheet.getLastColumn();
+  if (start !== -1) {
+    sheet.deleteColumns(start + 1, end - start);
   }
 };
