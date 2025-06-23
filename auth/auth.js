@@ -9,6 +9,7 @@ const postAuth = (login, password) => {
     contentType: "application/json",
     headers: {
       "X-Api-Key": apiProps.key,
+      "X-Tkr-ca89yw98ch3wartg42": "true",
     },
     payload: JSON.stringify({ email: login, password }),
   };
