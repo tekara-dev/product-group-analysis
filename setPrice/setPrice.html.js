@@ -7,6 +7,18 @@
   var suppliers = [];
   var supplierId = "";
 
+  const getSuppliers = async () => {
+    const meta = await makeCsApiCall(
+      `/v1/companies/meta?types=supplier&include=contacts`
+    );
+    let companies = await makeCsApiCall(
+      `/v1/companies?offset=0&limit=${Number(
+        meta.total || 10000
+      )}&types=supplier&include=contacts&search=`
+    );
+    return companies;
+  };
+
   const fillDdl = (data, ddl, selected) => {
     if (!ddl) return;
 
@@ -32,7 +44,7 @@
     supplierChoices.disable();
 
     const [data, sId] = await Promise.all([
-      getServerData("getSuppliers"),
+      getSuppliers(),
       getServerData("getStoredSupplierId"),
     ]);
 

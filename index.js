@@ -66,11 +66,7 @@ const showBaseMenu = (page, other) => {
 };
 
 const showAnalizeMenu = () => {
-  const auth = postAuthMe();
-  if (!auth || !auth.id)
-    return showBaseMenu("auth/auth", { from: "analyze/analyze" });
-
-  showBaseMenu("analyze/analyze");
+  return showBaseMenu("auth/auth", { from: "analyze/analyze" });
 };
 
 const showApiSettingsMenu = () => {
@@ -78,32 +74,16 @@ const showApiSettingsMenu = () => {
 };
 
 const showSetPriceMenu = () => {
-  const auth = postAuthMe();
-  if (!auth || !auth.id)
-    return showBaseMenu("auth/auth", { from: "setPrice/setPrice" });
-
-  showBaseMenu("setPrice/setPrice");
+  return showBaseMenu("auth/auth", { from: "setPrice/setPrice" });
 };
 const showSettingsMenu = () => {
-  const auth = postAuthMe();
-  if (!auth || !auth.id)
-    return showBaseMenu("auth/auth", { from: "settings/settings" });
-
-  showBaseMenu("settings/settings");
+  return showBaseMenu("auth/auth", { from: "settings/settings" });
 };
 
 const showNavigationMenu = () => {
-  const auth = postAuthMe();
-  if (!auth || !auth.id)
-    return showBaseMenu("auth/auth", { from: "navigation/navigation" });
-
-  showBaseMenu("navigation/navigation");
+  return showBaseMenu("auth/auth", { from: "navigation/navigation" });
 };
 
 const showAuthMenu = () => {
-  const auth = postAuthMe();
-  if (!auth || !auth.id)
-    return showBaseMenu("auth/auth", { from: "auth/auth" });
-
   showBaseMenu("auth/auth");
 };

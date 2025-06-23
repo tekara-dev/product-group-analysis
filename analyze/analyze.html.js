@@ -66,7 +66,6 @@
     loadContent("toggle/toggle.js"),
   ]);
 
-
   const sourceRussianToggle = generateToggle(sourceRussian);
   const sourceForeignToggle = generateToggle(sourceForeign);
   const sourceShadowToggle = generateToggle(sourceShadow);
@@ -175,12 +174,24 @@
     );
   };
 
+  const getSuppliers = async () => {
+    const meta = await makeCsApiCall(
+      `/v1/companies/meta?types=supplier&include=contacts`
+    );
+    let companies = await makeCsApiCall(
+      `/v1/companies?offset=0&limit=${Number(
+        meta.total || 10000
+      )}&types=supplier&include=contacts&search=`
+    );
+    return companies;
+  };
+
   const initSuppliers = async () => {
     addLoader("Получаем список поставщиков");
     supplierChoices.disable();
 
     const [data, sId] = await Promise.all([
-      getServerData("getSuppliers"),
+      getSuppliers(),
       getServerData("getStoredSupplierId"),
     ]);
 
@@ -251,6 +262,26 @@
     btnAnal.style.display = "";
   }
 
+  const postAnalyze = async(data, makerId, modelId, supplierId, source) => {
+    var sourceStrings = [];
+  
+    if (source.sourceRussian) sourceStrings.push("RussiaLocated");
+    if (source.sourceForeign) sourceStrings.push("ChinaLocated");
+    if (source.sourceShadow) sourceStrings.push("ShadowOffer");
+  
+    var sourceQuery = `&source=${sourceStrings.join("&source=")}`;
+  
+    const url = `/priceAnalyzer/analyzeFromComparisonTree?makerId=${makerId}&modelId=${modelId}&supplierId=${supplierId}${sourceQuery}`;
+    console.log("url:", url);
+    console.log("data:", JSON.stringify(data));
+  
+    try {
+      return { result: await makeOffersApiCall(url, "post", data), url, data };
+    } catch (e) {
+      return { result: [], url, data, error: e };
+    }
+  };
+
   btnAnal.addEventListener("click", async () => {
     btnAnal.disabled = true;
     treeSkeleton.style.display = "";
@@ -258,8 +289,12 @@
     addLoader("Анализируем");
     let noClear = false;
     try {
-      const res = await getServerData("runAnalyze", [isAnalyzeErrors]);
-      console.log("Analyze result", res);
+
+        const {data, makerId, modelId, supplierId, source} = await getServerData("repareAnalyzeData", [isAnalyzeErrors]);
+        const res = await postAnalyze(data, makerId, modelId, supplierId, source);
+        console.log("Analyze result", res);
+        const fillRes = await getServerData("fillAnalyzeResult", [data, res.result]);
+        console.log("Array to fill", fillRes);
       if (res.error) {
         printError(res.error);
         noClear = true;

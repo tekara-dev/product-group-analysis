@@ -8,6 +8,10 @@ const groupedPropNameSeparator = "|";
 const maxCharsInPropName = 15;
 const oneCharWidth = 9;
 
+const testObjects = (obj) => {
+  return obj;
+};
+
 const testRunAnalyze = () => {
   const res = runAnalyze(true);
   console.log(res);
@@ -134,11 +138,11 @@ const excludeErrors = (tree, errors) => {
 };
 
 /**
- * Run the analyze. Runs on "Анализировать" button click.
+ * Prepare analyze result
  * @param {boolean} noErrors - Whether to exclude errors from the tree
- * @returns {Promise} - A promise that resolves to the result of the analyze
+ * @returns {Object} - The analyze result
  */
-const runAnalyze = async (noErrors = false) => {
+const prepareAnalyzeResult = (noErrors) => {
   const treeData = getActiveTable(true);
   setTablePrice(treeData);
 
@@ -161,11 +165,10 @@ const runAnalyze = async (noErrors = false) => {
 
   const source = getDocProps("analyzeSourceSettings") || {};
 
-  //Отправляем запрос на анализ
-  const { result: res, url, data: requestData, error } = await postAnalyze(req, makerId, modelId, supplierId, source);
-  if (error) {
-    return { error: error, url, requestData };
-  }
+  return { data: req, makerId, modelId, supplierId, source };
+};
+
+const fillAnalyzeResult = (req, res) => {
   const sheet = SpreadsheetApp.getActiveSpreadsheet().getActiveSheet();
   const { start: headerRowIndex } = getTableInfoData(sheet.getName());
 
@@ -180,10 +183,7 @@ const runAnalyze = async (noErrors = false) => {
   );
 
   //Очищаем предыдущие анализированные значения
-  cleanAnalyzedProps(
-    getHeaderRows(sheet, headerRowIndex),
-    sheet
-  );
+  cleanAnalyzedProps(getHeaderRows(sheet, headerRowIndex), sheet);
 
   //Заполняем строку с данными поставщика
   if (res.supplier) {
@@ -210,8 +210,69 @@ const runAnalyze = async (noErrors = false) => {
 
   mergeAndFixCats(sheet, headerRowIndex);
 
+  return arrToFill;
+};
+
+/**
+ * Run the analyze. Runs on "Анализировать" button click.
+ * @param {boolean} noErrors - Whether to exclude errors from the tree
+ * @returns {Promise} - A promise that resolves to the result of the analyze
+ */
+const runAnalyze = async (noErrors = false) => {
+  //   const treeData = getActiveTable(true);
+  //   setTablePrice(treeData);
+
+  //   const req = {
+  //     settings: getCustomParams(),
+  //     rows: treeData,
+  //   };
+
+  //   const { makerId, modelId } = getStoredSheetSettings();
+  //   const supplierId = getStoredSupplierId();
+  //   const errors = validateTree(treeData);
+
+  //   if (!noErrors) {
+  //     if (errors.length > 0) {
+  //       return { error: "Есть ошибки в дереве", errors };
+  //     }
+  //   } else {
+  //     req.rows = excludeErrors(treeData, errors);
+  //   }
+
+  //   const source = getDocProps("analyzeSourceSettings") || {};
+
+  const {
+    data: req,
+    makerId,
+    modelId,
+    supplierId,
+    source,
+  } = prepareAnalyzeResult(noErrors);
+
+  //Отправляем запрос на анализ
+  const {
+    result: res,
+    url,
+    data: requestData,
+    error,
+  } = postAnalyze(req, makerId, modelId, supplierId, source);
+  if (error) {
+    return { error: error, url, requestData };
+  }
+
+  const arrToFill = fillAnalyzeResult(req, res);
+
   //Возвращаем результаты анализа и входные данные. Для отладки
-  return { res, req, arrToFill, makerId, modelId, supplierId, url, requestData };
+  return {
+    res,
+    req,
+    arrToFill,
+    makerId,
+    modelId,
+    supplierId,
+    url,
+    requestData,
+  };
 };
 
 /**
@@ -551,7 +612,14 @@ const mergeAndFixCats = (sheet, headerRowIndex) => {
 const cleanAnalyzedProps = (headerRows, sheet) => {
   let first = headerRows[0].findIndex((x) => x.includes(analyzedSymbol));
   let second = headerRows[1].findIndex((x) => x.includes(analyzedSymbol));
-  const start = first !== -1 && second !== -1 ? Math.min(first, second) : first !== -1 ? first : second !== -1 ? second : -1;
+  const start =
+    first !== -1 && second !== -1
+      ? Math.min(first, second)
+      : first !== -1
+      ? first
+      : second !== -1
+      ? second
+      : -1;
   const end = sheet.getLastColumn();
   if (start !== -1) {
     sheet.deleteColumns(start + 1, end - start);

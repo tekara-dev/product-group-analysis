@@ -14,40 +14,59 @@
   };
 
   const refresh = async () => {
-    addLoader("Обновляем информацию об авторизации...");
-
     const meRes = await authMe();
+
     if (meRes.id) {
-      cntForm.style.display = "none";
-      cntInfo.style.display = "";
-
-      const { firstName = "", lastName = "" } = meRes.contact || {};
-      const nameToShow = firstName || lastName ? `${firstName} ${lastName}` : meRes.username || meRes.email || "неизвестный пользователь";
-      cntInfo.getElementsByTagName("span")[0].innerHTML = nameToShow;
-
+      //Если есть куда перенаправлять, то перенаправляем
       if (pageData && pageData.from) {
         redirect(pageData.from);
+      } else {
+        //Если нет куда перенаправлять, то показываем информацию об авторизации
+        cntForm.style.display = "none";
+        cntInfo.style.display = "";
+
+        const { firstName = "", lastName = "" } = meRes.contact || {};
+        const nameToShow =
+          firstName || lastName
+            ? `${firstName} ${lastName}`
+            : meRes.username || meRes.email || "неизвестный пользователь";
+        cntInfo.getElementsByTagName("span")[0].innerHTML = nameToShow;
       }
     } else {
+      //Если нет авторизации, то показываем форму авторизации
       cntForm.style.display = "";
       cntInfo.style.display = "none";
     }
-
-    removeLoader("Обновляем информацию об авторизации...");
   };
 
   const login = async () => {
-    const res = await getServerData("postAuth", [
-      inputEmail.value,
-      inputPassword.value,
-    ]);
-    console.log(res);
-    return res;
+    errorP.style.display = "none";
+    errorP.innerHTML = "";
+
+    try {
+      const res = await makeCsApiCall(
+        "/v1/auth/login",
+        "POST",
+        {
+          email: inputEmail.value,
+          password: inputPassword.value,
+        },
+        true
+      );
+
+      await getServerData("setLoginToken", [res.token]);
+      return res;
+    } catch (e) {
+      errorP.innerHTML = `Ошибка авторизации. ${e.message}`;
+      errorP.style.display = "";
+      return { error: e.message };
+    }
   };
 
   const authMe = async () => {
-    const res = await getServerData("postAuthMe");
-    console.log(res);
+    addLoader("Обновляем информацию об авторизации...");
+    const res = await makeCsApiCall("/v2/auth/me");
+    removeLoader("Обновляем информацию об авторизации...");
     return res;
   };
 
@@ -80,5 +99,4 @@
   });
 
   refresh();
-
 })();

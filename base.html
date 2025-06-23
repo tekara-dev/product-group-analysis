@@ -27,6 +27,43 @@
       return res;
     };
 
+    const makeCsApiCall = async (url, method, data, noAuth) => {
+      return await makeApiCall(url, method, data, "cs", noAuth);
+    };
+
+    const makeOffersApiCall = async (url, method, data, noAuth) => {
+      return await makeApiCall(url, method, data, "offers", noAuth);
+    };
+    const makeApiCall = async (
+      url,
+      method = "GET",
+      data,
+      apiType = "cs",
+      noAuth,
+    ) => {
+      const [apiProps, token] = await Promise.all([
+        getServerData("getActiveApiProps", []),
+        getServerData("getLoginToken", []),
+      ]);
+      const options = {
+        method: method,
+        headers: {
+          "Content-Type": "application/json",
+          "X-Api-Key": apiProps.key,
+          ...(noAuth ? {} : { Authorization: apiType === "cs" ? `Bearer ${token}` : token }),
+        },
+        credentials: "include",
+        body: JSON.stringify(data),
+      };
+      try {
+        const resp = await fetch(`${apiProps[`${apiType}Url`]}${url}`, options);
+        const res = await resp.json();
+        return res;
+      } catch (e) {
+        return { error: e.message };
+      }
+    };
+
     const renderLoader = () => {
       loaderCnt.style.display = loaders.length > 0 ? "" : "none";
       loaderCnt.innerHTML = loaders.join("<br />");

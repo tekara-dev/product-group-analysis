@@ -149,7 +149,7 @@
 
     if (!makerId || !categoryId) return fill([]);
 
-    const data = await getServerData("getModels", [makerId, categoryId], true); //Из кеша, если возможно
+    const data = await getModels(makerId, categoryId); //await getServerData("getModels", [makerId, categoryId], true); //Из кеша, если возможно
     models = [...data];
 
     fill(models);
@@ -218,10 +218,17 @@
     return true;
   };
 
+  const getMakers = () => makeOffersApiCall("/catalog/makers", "GET", undefined, true);
+  const getCategories = () => makeOffersApiCall("/catalog/categories", "GET", undefined, true);
+  const getModels = (makerId, categoryId) =>
+    makeOffersApiCall(
+      `/catalog/models?makerId=${makerId}&categoryId=${categoryId}`
+    );
+
   const initMakers = async () => {
     startDdlLoader(makerChoices, "Получаем список производителей");
 
-    const data = await getServerData("getMakers", undefined, true); //Из кеша, если есть
+    const data = await getMakers();//await getServerData("getMakers", undefined, true); //Из кеша, если есть
 
     stopDdlLoader(makerChoices, "Получаем список производителей");
 
@@ -238,7 +245,7 @@
   const initCategories = async () => {
     startDdlLoader(categoryChoices, "Получаем список категорий");
 
-    const data = await getServerData("getCategories", undefined, true); //Из кеша, если есть
+    const data = await getCategories();//await getServerData("getCategories", undefined, true); //Из кеша, если есть
     stopDdlLoader(categoryChoices, "Получаем список категорий");
 
     categories = [...data];
